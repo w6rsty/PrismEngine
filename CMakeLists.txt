@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(PrismEngine
+    VERSION 0.1.0
+    LANGUAGES CXX C
+)
+
+add_subdirectory(3rdlibs)
+add_subdirectory(prism)
+add_subdirectory(sandbox)
+
+option(PRISM_BUILD_UNIT_TEST "Build unit test" OFF)
+if (PRISM_BUILD_UNIT_TEST)
+    include(CTest)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
+option(ENABLE_LOG "Enable log" ON)
+option(ENABLE_ASSERTION "Enable assert" ON)
