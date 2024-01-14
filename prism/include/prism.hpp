@@ -12,6 +12,9 @@
 #include "window/window.hpp"
 #include "platform/Windows/windows_window.hpp"
 
+#include "application/layer.hpp"
 #include "application/application.hpp"
 
-#define BIND_EVENT_CALLBACK(fn) std::bind(&fn, this, std::placeholders::_1)
+#include "imgui/imgui_layer.hpp"
+
+#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

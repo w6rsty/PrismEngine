@@ -13,15 +13,18 @@ public:
     void Run();
     void OnEvent(Event& event);
 
-    inline static Application* Instance() {
-        return s_Instance;
-    }
+    void PushLayer(Layer* layer);
+    void PushOverlay(Layer* overlay);
 
+    inline static Application& Instance() { return *s_Instance; }
+    inline Window& GetWindow() { return *m_Window; }
+private:
     bool OnWindowClose(WindowCloseEvent& event);
 private:
     static Application* s_Instance;
     std::unique_ptr<Window> m_Window;
     bool m_Running = true;
+    LayerStack m_LayerStack;
 };
 
 

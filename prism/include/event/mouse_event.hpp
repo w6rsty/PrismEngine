@@ -16,7 +16,7 @@ public:
 
     std::string ToString() const override {
         std::stringstream ss;
-        ss << "MouseMovedEvent: " << m_MouseX << ", " << m_MouseY;
+        ss << "MouseMoved: " << m_MouseX << ", " << m_MouseY;
         return ss.str();
     }
 
@@ -35,7 +35,7 @@ public:
 
     std::string ToString() const override {
         std::stringstream ss;
-        ss << "MouseScrolledEvent: " << m_XOffset << ", " << m_YOffset;
+        ss << "MouseScrolled: " << m_XOffset << ", " << m_YOffset;
         return ss.str();
     }
 
@@ -59,7 +59,7 @@ public:
 
     std::string ToString() const override {
         std::stringstream ss;
-        ss << "MouseButtonPressedEvent: " << m_Button;
+        ss << "MouseButtonPressed: " << m_Button;
         return ss.str();
     }
     
@@ -72,7 +72,7 @@ public:
 
     std::string ToString() const override {
         std::stringstream ss;
-        ss << "MouseButtonReleasedEvent: " << m_Button;
+        ss << "MouseButtonReleased: " << m_Button;
         return ss.str();
     }
 

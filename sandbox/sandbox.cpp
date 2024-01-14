@@ -1,15 +1,30 @@
 #include <iostream>
 
 #include "prism.hpp"
+#include "imgui/imgui_layer.hpp"
 
-using namespace prism;
-
-class Sandbox : public Application {
+class AppLayer : public prism::Layer {
 public:
-    Sandbox() {}
+    AppLayer() : Layer("AppLayer") {}
+    ~AppLayer() {}
+
+    void OnUpdate() override {
+    }
+
+    void OnEvent(prism::Event& event) override {
+
+    }
+};
+
+class Sandbox : public prism::Application {
+public:
+    Sandbox() {
+        PushLayer(new AppLayer());
+        PushOverlay(new prism::ImGuiLayer());
+    }
     ~Sandbox() {}
 };
 
-Application* CreateApplication() {
+prism::Application* CreateApplication() {
     return new Sandbox();
 }

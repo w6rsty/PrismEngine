@@ -1,3 +1,6 @@
 [submodule "3rdlibs/glfw"]
 	path = 3rdlibs/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "3rdlibs/imgui"]
+	path = 3rdlibs/imgui
+	url = https://github.com/ocornut/imgui
