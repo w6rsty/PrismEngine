@@ -2,6 +2,7 @@
 
 #include "prism.hpp"
 #include <memory>
+#include "imgui/imgui_layer.hpp"
 
 namespace prism {
 
@@ -23,10 +24,9 @@ private:
 private:
     static Application* s_Instance;
     std::unique_ptr<Window> m_Window;
+    ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
     LayerStack m_LayerStack;
 };
-
-
 
 } // namespace prism
