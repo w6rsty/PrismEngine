@@ -7,7 +7,7 @@ int main(int argc, char** argv) {
     LOG_INFO(prism::log_tag::Logger, "Initialized logger");
 
     auto app = CreateApplication();
-    LOG_INFO(prism::log_tag::App, "Created application");
+LOG_INFO(prism::log_tag::App, "Created application");
 
     try {
         app->Run();

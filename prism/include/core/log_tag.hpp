@@ -9,5 +9,6 @@ constexpr std::string_view App = "App";
 constexpr std::string_view Window = "Window";
 constexpr std::string_view TODO = "TODO";
 constexpr std::string_view Logger = "Logger";
+constexpr std::string_view Client = "Client";
 
 }

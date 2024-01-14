@@ -53,6 +53,7 @@ void ImGuiLayer::OnAttach() {
     io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
     ImGui_ImplOpenGL3_Init("#version 410");
+    
 }
 
 void ImGuiLayer::OnDetach() {
@@ -65,12 +66,11 @@ void ImGuiLayer::OnUpdate() {
     auto& app = Application::Instance();
     io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
     float time = (float)glfwGetTime();
-    io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
+    io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 24.0f);
     m_Time = time;
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
-
 
     static bool show = true;
     ImGui::ShowDemoWindow(&show);
@@ -150,7 +150,5 @@ bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent& event) {
     glViewport(0, 0, event.GetWidth(), event.GetHeight());
     return false;
 }
-
-
 
 } // namespace prism

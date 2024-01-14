@@ -10,7 +10,9 @@
 #include "event/application_event.hpp"
 
 #include "window/window.hpp"
+#include "window/keycodes.hpp"
 #include "platform/Windows/windows_window.hpp"
+#include "platform/Windows/windows_input.hpp"
 
 #include "application/layer.hpp"
 #include "application/application.hpp"

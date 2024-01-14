@@ -1,7 +1,10 @@
 #include "platform/Windows/windows_window.hpp"
 #include "prism.hpp"
+#include "platform/Windows/windows_input.hpp"
 
 namespace prism {
+
+Input* Input::s_Instance = new WindowsInput();
 
 static void GLFWErrorCallback(int error, const char* description) {
     LOG_ERROR(log_tag::Window, "GLFW Error (", error, "): ", description);
