@@ -3,6 +3,7 @@
 #include <memory>
 #include "imgui/imgui_layer.hpp"
 #include "event/application_event.hpp"
+#include "renderer/vertex_array.hpp"
 #include "window/window.hpp"
 
 #include "renderer/shader.hpp"
@@ -32,11 +33,8 @@ private:
     bool m_Running = true;
     LayerStack m_LayerStack;
 
-    // hack for now
-    uint32_t m_VertexArray;
-    std::unique_ptr<VertexBuffer> m_VertexBuffer;
-    std::unique_ptr<IndexBuffer> m_IndexBuffer;
-    std::unique_ptr<Shader> m_Shader;
+    std::shared_ptr<VertexArray> m_SquareVA;
+    std::shared_ptr<Shader> m_Shader;
 };
 
 } // namespace prism
