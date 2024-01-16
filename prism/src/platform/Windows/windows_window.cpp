@@ -1,6 +1,7 @@
 #include "platform/Windows/windows_window.hpp"
 #include "prism.hpp"
 #include "platform/Windows/windows_input.hpp"
+#include "platform/OpenGL/opengl_context.hpp"
 
 namespace prism {
 
@@ -24,16 +25,15 @@ void WindowsWindow::Init(const WindowProps& props) {
     m_Data.height = props.height;
     m_Data.vSync = true;
 
-    LOG_INFO(log_tag::Window, props.title , " ", props.width, " ", props.height);
-
+    LOG_INFO("EntryPoint", "==> ", props.title, " <==");
     PRISM_ASSERT(glfwInit(), "Failed to initialize GLFW", log_tag::Window);
+
     glfwSetErrorCallback(GLFWErrorCallback);
     m_Window = glfwCreateWindow(props.width, props.height, props.title.c_str(), nullptr, nullptr);
-    glfwMakeContextCurrent(m_Window);
+    PRISM_ASSERT(m_Window, "Failed to create GLFW window", log_tag::Window);
 
-    // rhi 
-    int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    PRISM_ASSERT(status, "Failed to initialize Glad", log_tag::Window);
+    m_Context = new OpenGLContext(m_Window);
+    m_Context->Init();
 
     glfwSetWindowUserPointer(m_Window, &m_Data);
     SetVSync(m_Data.vSync);
@@ -113,7 +113,7 @@ void WindowsWindow::Shutdown() {
 
 void WindowsWindow::OnUpdate() {
     glfwPollEvents();
-    glfwSwapBuffers(m_Window);
+    m_Context->SwapBuffers();
 }
     
 unsigned int WindowsWindow::GetWidth() const {

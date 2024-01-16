@@ -12,8 +12,8 @@ struct WindowProps {
     unsigned int height;
 
     WindowProps(const std::string& title = "PrismEngine",   
-                unsigned int w = 1280, 
-                unsigned int h = 800)
+                unsigned int w = 1920, 
+                unsigned int h = 1080)
     : title(title), width(w), height(h) {}
 };
 

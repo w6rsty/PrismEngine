@@ -1,8 +1,9 @@
 #pragma once
 
 #include "debugbreak.hpp"
-#include "prism.hpp"
 #include <cassert>
+#include "logger.hpp"
+#include "log_tag.hpp"
 
 #ifdef ENABLE_ASSERTION
     #define PRISM_ASSERT(expr, msg, tag)    \

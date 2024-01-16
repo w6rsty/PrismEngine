@@ -1,8 +1,12 @@
 #pragma once
 
-#include "prism.hpp"
 #include <memory>
 #include "imgui/imgui_layer.hpp"
+#include "event/application_event.hpp"
+#include "window/window.hpp"
+
+#include "renderer/shader.hpp"
+#include "renderer/buffer.hpp"
 
 namespace prism {
 
@@ -27,6 +31,12 @@ private:
     ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
     LayerStack m_LayerStack;
+
+    // hack for now
+    uint32_t m_VertexArray;
+    std::unique_ptr<VertexBuffer> m_VertexBuffer;
+    std::unique_ptr<IndexBuffer> m_IndexBuffer;
+    std::unique_ptr<Shader> m_Shader;
 };
 
 } // namespace prism

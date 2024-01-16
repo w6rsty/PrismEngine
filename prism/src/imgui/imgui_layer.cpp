@@ -5,6 +5,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "GLFW/glfw3.h"
 
 namespace prism {
 
@@ -26,7 +27,10 @@ void ImGuiLayer::OnAttach() {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
     ImGui::StyleColorsDark();
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("../../resources/font/JetBrainsMonoNerdFontMono-SemiBold.ttf", 24);
 
     auto& app = Application::Instance();
     GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());

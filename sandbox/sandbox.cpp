@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "glad/glad.h"
 #include "prism.hpp"
 #include "imgui.h"
 
@@ -13,8 +14,10 @@ public:
     }
 
     void OnImGuiRender() override {
-        ImGui::Begin("Test");
-        ImGui::Text("Hello World");
+        ImGui::Begin("Renderer");
+        ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
+        ImGui::Text("Device: %s", glGetString(GL_RENDERER));
+        ImGui::Text("Version: %s", glGetString(GL_VERSION));
         ImGui::End();
     }
 

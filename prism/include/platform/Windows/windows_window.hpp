@@ -1,7 +1,7 @@
 #pragma once
 
 #include "window/window.hpp"
-#include "glad/glad.h"
+#include "renderer/graphics_context.hpp"
 #include "GLFW/glfw3.h"
 
 namespace prism {
@@ -27,6 +27,7 @@ private:
     void Shutdown();
 private:
     GLFWwindow* m_Window;
+    GraphicsContext* m_Context;
 
     struct WindowData {
         std::string title;

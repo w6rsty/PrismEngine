@@ -71,8 +71,6 @@ private:
 
     template <typename... Args>
     void logImpl(Level level, std::string_view funcName, std::string_view fileName, unsigned int line, Args&&... args) {
-        // get time 
-
         printf("[%s] [%s] [%s:%u] ", Level2Str(level).data(), funcName.data(), fileName.data(), line);
         doLogImpl(std::forward<Args>(args)...);
         m_Stream << std::endl;
