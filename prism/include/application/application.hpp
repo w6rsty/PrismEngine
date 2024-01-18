@@ -3,11 +3,8 @@
 #include <memory>
 #include "imgui/imgui_layer.hpp"
 #include "event/application_event.hpp"
-#include "renderer/vertex_array.hpp"
 #include "window/window.hpp"
-
-#include "renderer/shader.hpp"
-#include "renderer/buffer.hpp"
+#include "core/timestep.hpp"
 
 namespace prism {
 
@@ -27,14 +24,13 @@ public:
 private:
     bool OnWindowClose(WindowCloseEvent& event);
 private:
-    static Application* s_Instance;
     std::unique_ptr<Window> m_Window;
     ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
     LayerStack m_LayerStack;
-
-    std::shared_ptr<VertexArray> m_SquareVA;
-    std::shared_ptr<Shader> m_Shader;
+    float m_LastFrameTime = 0.0f;
+private:
+    static Application* s_Instance;
 };
 
 } // namespace prism

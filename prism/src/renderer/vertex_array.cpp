@@ -7,12 +7,12 @@ namespace prism {
 
 VertexArray* VertexArray::Create() {
     switch (Renderer::GetAPI()) {
-        case RendererAPI::OpenGL: {
-            return new OpenGLVertexArray();
-        }
-        case RendererAPI::None: {
+        case RendererAPI::API::None: {
             PRISM_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
             return nullptr;
+        }
+        case RendererAPI::API::OpenGL: {
+            return new OpenGLVertexArray();
         }
     }
 }
