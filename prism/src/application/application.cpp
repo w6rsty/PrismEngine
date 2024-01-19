@@ -1,8 +1,10 @@
 #include "application/application.hpp"
 #include "event/event.hpp"
-#include <functional>
+#include "renderer/render_command.hpp"
 
 #include "GLFW/glfw3.h"
+
+#include <functional>
 
 namespace prism {
 
@@ -12,8 +14,12 @@ Application* Application::s_Instance = nullptr;
 
 Application::Application() {
     s_Instance = this;
-    m_Window = std::unique_ptr<Window>(Window::Create());
+
+    m_Window = Scope<Window>(Window::Create());
     m_Window->SetEventCallback(BIND_APP_EVENT_FN(OnEvent));
+
+    RenderCommand::Init();
+
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);
 }
@@ -23,6 +29,7 @@ Application::~Application() {}
 void Application::OnEvent(Event& event) {
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<WindowCloseEvent>(BIND_APP_EVENT_FN(OnWindowClose));
+    dispatcher.Dispatch<WindowResizeEvent>(BIND_APP_EVENT_FN(OnWindowResize));
 
     for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
         (*--it)->OnEvent(event);
@@ -33,6 +40,17 @@ void Application::OnEvent(Event& event) {
 bool Application::OnWindowClose(WindowCloseEvent& event) {
     m_Running = false;
     return true;
+}
+
+bool Application::OnWindowResize(WindowResizeEvent& event) {
+    // if(event.GetWidth() == 0 || event.GetHeight() == 0) {
+    //     m_Minimized = true;
+    //     return false;
+    // }
+
+    // m_Minimized = false;
+    RenderCommand::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
+    return false;
 }
 
 void Application::Run() {

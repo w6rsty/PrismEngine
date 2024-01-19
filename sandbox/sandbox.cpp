@@ -8,6 +8,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "imgui.h"
+#include "renderer/texture.hpp"
 
 class AppLayer : public prism::Layer {
 public:
@@ -15,51 +16,67 @@ public:
     : Layer("AppLayer"), 
       m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
       m_CameraPosition(0.0f, 0.0f, 0.0f) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.Fonts->AddFontFromFileTTF("../../assets/fonts/JetBrainsMonoNerdFontMono-SemiBold.ttf", 24.0f);
 
         m_Color = glm::vec4(1.0, 1.0, 1.0, 1.0);
         float vertices[] = {
-            -0.5f, -0.5f, 0.0f, // 0
-            0.5f, -0.5f, 0.0f, // 1
-            0.5f,  0.5f, 0.0f, // 2
-            -0.5f,  0.5f, 0.0f  // 3
+            -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
+             0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
+            -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
         };
         prism::BufferLayout layout = {
             { prism::ShaderDataType::Float3, "a_Position" },
+            { prism::ShaderDataType::Float2, "a_TexCoord" },
         };
         uint32_t indices[] = {
             0, 1, 2,
             2, 3, 0
         };
 
-        m_SquareVA.reset(prism::VertexArray::Create());
+        m_SquareVA = prism::VertexArray::Create();
         
-        std::shared_ptr<prism::VertexBuffer> squareVB;
-        squareVB.reset(prism::VertexBuffer::Create(vertices, sizeof(vertices)));
+        prism::Ref<prism::VertexBuffer> squareVB;
+        squareVB = prism::VertexBuffer::Create(vertices, sizeof(vertices));
         squareVB->SetLayout(layout);
         m_SquareVA->AddVertexBuffer(squareVB);
-        std::shared_ptr<prism::IndexBuffer> squareIB;
-        squareIB.reset(prism::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+        prism::Ref<prism::IndexBuffer> squareIB = 
+            prism::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
         m_SquareVA->SetIndexBuffer(squareIB);
+
+        m_Texture = prism::Texture2D::Create("../../assets/textures/Checkerboard.png");
 
         std::string vertexSrc = R"(
             #version 460 core
             layout(location = 0) in vec3 a_Position;
+            layout(location = 1) in vec2 a_TexCoord;
+
             uniform mat4 u_ViewProjection;
             uniform mat4 u_Model;
+
+            out vec2 v_TexCoord;
+
             void main() {
                 gl_Position = u_ViewProjection * u_Model * vec4(a_Position, 1.0);
+                v_TexCoord = a_TexCoord;
             }
         )";
         std::string fragmentSrc = R"(
             #version 460 core
             layout(location = 0) out vec4 color;
+
+            in vec2 v_TexCoord;
+
             uniform vec4 u_Color;
+            uniform sampler2D u_Texture;
+            
             void main() {
-                color = u_Color;
+                color = texture(u_Texture, v_TexCoord) * u_Color;
             }
         )";
 
-        m_Shader.reset(prism::Shader::Create(vertexSrc, fragmentSrc));
+        m_Shader = prism::Shader::Create(vertexSrc, fragmentSrc);
     }
     ~AppLayer() {}
 
@@ -93,16 +110,12 @@ public:
         prism::Renderer::BeginScene(m_Camera);
 
         std::dynamic_pointer_cast<prism::OpenGLShader>(m_Shader)->Bind();
+        std::dynamic_pointer_cast<prism::OpenGLShader>(m_Shader)->SetUniformInt("u_Texture", 0);
         std::dynamic_pointer_cast<prism::OpenGLShader>(m_Shader)->SetUniformFloat4("u_Color", m_Color);
+        m_Texture->Bind();
     
+        prism::Renderer::Submit(m_Shader, m_SquareVA);
 
-        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
-                prism::Renderer::Submit(m_Shader, m_SquareVA, glm::translate(glm::mat4(1.0f), pos) * scale);
-            }
-        }
         prism::Renderer::EndScene();
     }
 
@@ -118,8 +131,9 @@ public:
 
     }
 private:
-    std::shared_ptr<prism::VertexArray> m_SquareVA;
-    std::shared_ptr<prism::Shader> m_Shader;
+    prism::Ref<prism::VertexArray> m_SquareVA;
+    prism::Ref<prism::Shader> m_Shader;
+    prism::Ref<prism::Texture> m_Texture;
     prism::OrthographicCamera m_Camera;
     glm::vec3 m_CameraPosition;
     float m_CameraMoveSpeed = 1.0f;

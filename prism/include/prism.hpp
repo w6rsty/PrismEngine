@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/core.hpp"
 #include "core/assert.hpp"
 #include "core/logger.hpp"
 #include "core/timestep.hpp"
@@ -20,6 +21,7 @@
 #include "renderer/shader.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/camera.hpp"
+#include "renderer/texture.hpp"
 
 
 #define PRISM_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

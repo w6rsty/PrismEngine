@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
+#include "core/core.hpp"
+#include "core/timestep.hpp"
+#include "window/window.hpp"
 #include "imgui/imgui_layer.hpp"
 #include "event/application_event.hpp"
-#include "window/window.hpp"
-#include "core/timestep.hpp"
 
 namespace prism {
 
@@ -23,8 +23,9 @@ public:
     inline Window& GetWindow() { return *m_Window; }
 private:
     bool OnWindowClose(WindowCloseEvent& event);
+    bool OnWindowResize(WindowResizeEvent& event);
 private:
-    std::unique_ptr<Window> m_Window;
+    Scope<Window> m_Window;
     ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
     LayerStack m_LayerStack;

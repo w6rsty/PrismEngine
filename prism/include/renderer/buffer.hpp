@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <stdint.h>
 #include <vector>
 #include <string>
 #include <initializer_list>
 #include "core/assert.hpp"
+#include "core/core.hpp"
 
 namespace prism {
 
@@ -108,7 +108,7 @@ public:
     virtual void SetLayout(const BufferLayout& layout) = 0;
     virtual const BufferLayout& GetLayout() const = 0;
 
-    static VertexBuffer* Create(float* vertices, uint32_t size);
+    static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 };
 
 class IndexBuffer {
@@ -120,7 +120,7 @@ public:
 
     virtual uint32_t GetCount() const = 0;
 
-    static IndexBuffer* Create(uint32_t* indices, uint32_t count);
+    static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 };
 
 } // namespace prism
