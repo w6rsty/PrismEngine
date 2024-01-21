@@ -21,12 +21,11 @@ target_include_directories(prism_core PUBLIC ./include)
 target_compile_features(prism_core PUBLIC cxx_std_17)
 target_link_libraries(prism_core PUBLIC glfw glad debugbreak imgui glm stb_image)
 target_compile_definitions(prism_core PUBLIC _CRT_SECURE_NO_WARNINGS)
-if (ENABLE_LOG)
+if (CMAKE_CXX_FLAGS_DEBUG) 
     target_compile_definitions(prism_core PUBLIC ENABLE_LOG)
-endif()
-if (ENABLE_ASSERTION)
     target_compile_definitions(prism_core PUBLIC ENABLE_ASSERTION)
 endif()
+
 
 
 add_library(prism STATIC)

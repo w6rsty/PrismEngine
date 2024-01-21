@@ -8,7 +8,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "imgui.h"
-#include "renderer/texture.hpp"
+
 
 class AppLayer : public prism::Layer {
 public:
@@ -19,7 +19,6 @@ public:
         ImGuiIO& io = ImGui::GetIO();
         io.Fonts->AddFontFromFileTTF("../../assets/fonts/JetBrainsMonoNerdFontMono-SemiBold.ttf", 24.0f);
 
-        m_Color = glm::vec4(1.0, 1.0, 1.0, 1.0);
         float vertices[] = {
             -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
              0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
@@ -47,36 +46,7 @@ public:
 
         m_Texture = prism::Texture2D::Create("../../assets/textures/Checkerboard.png");
 
-        std::string vertexSrc = R"(
-            #version 460 core
-            layout(location = 0) in vec3 a_Position;
-            layout(location = 1) in vec2 a_TexCoord;
-
-            uniform mat4 u_ViewProjection;
-            uniform mat4 u_Model;
-
-            out vec2 v_TexCoord;
-
-            void main() {
-                gl_Position = u_ViewProjection * u_Model * vec4(a_Position, 1.0);
-                v_TexCoord = a_TexCoord;
-            }
-        )";
-        std::string fragmentSrc = R"(
-            #version 460 core
-            layout(location = 0) out vec4 color;
-
-            in vec2 v_TexCoord;
-
-            uniform vec4 u_Color;
-            uniform sampler2D u_Texture;
-            
-            void main() {
-                color = texture(u_Texture, v_TexCoord) * u_Color;
-            }
-        )";
-
-        m_Shader = prism::Shader::Create(vertexSrc, fragmentSrc);
+        m_ShaderLibrary.Load("texture", "../../assets/shaders/texture.glsl");
     }
     ~AppLayer() {}
 
@@ -109,20 +79,18 @@ public:
 
         prism::Renderer::BeginScene(m_Camera);
 
-        std::dynamic_pointer_cast<prism::OpenGLShader>(m_Shader)->Bind();
-        std::dynamic_pointer_cast<prism::OpenGLShader>(m_Shader)->SetUniformInt("u_Texture", 0);
-        std::dynamic_pointer_cast<prism::OpenGLShader>(m_Shader)->SetUniformFloat4("u_Color", m_Color);
+        auto textureShader = std::dynamic_pointer_cast<prism::OpenGLShader>(m_ShaderLibrary.Get("texture"));
+        textureShader->Bind();
+        textureShader->SetUniformInt("u_Texture", 0);
         m_Texture->Bind();
     
-        prism::Renderer::Submit(m_Shader, m_SquareVA);
+        prism::Renderer::Submit(textureShader, m_SquareVA);
 
         prism::Renderer::EndScene();
     }
 
     void OnImGuiRender() override {
-        ImGui::Begin("Debug");
-        ImGui::ColorEdit4("Square", glm::value_ptr(m_Color));
-        ImGui::End();
+
     }
 
 
@@ -131,16 +99,14 @@ public:
 
     }
 private:
+    prism::ShaderLibrary m_ShaderLibrary;
     prism::Ref<prism::VertexArray> m_SquareVA;
-    prism::Ref<prism::Shader> m_Shader;
     prism::Ref<prism::Texture> m_Texture;
     prism::OrthographicCamera m_Camera;
     glm::vec3 m_CameraPosition;
     float m_CameraMoveSpeed = 1.0f;
     float m_CameraRotation = 0.0f;
     float m_CameraRotationSpeed = 180.0f;
-
-    glm::vec4 m_Color;
 };
 
 class Sandbox : public prism::Application {
