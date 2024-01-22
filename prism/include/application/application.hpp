@@ -21,6 +21,7 @@ public:
 
     inline static Application& Instance() { return *s_Instance; }
     inline Window& GetWindow() { return *m_Window; }
+    inline void SetWindowState(bool state) { m_Running = state; }
 private:
     bool OnWindowClose(WindowCloseEvent& event);
     bool OnWindowResize(WindowResizeEvent& event);

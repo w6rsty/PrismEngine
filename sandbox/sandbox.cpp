@@ -45,6 +45,7 @@ public:
         m_SquareVA->SetIndexBuffer(squareIB);
 
         m_Texture = prism::Texture2D::Create("../../assets/textures/Checkerboard.png");
+        m_Logo = prism::Texture2D::Create("../../assets/textures/circle.png");
 
         m_ShaderLibrary.Load("texture", "../../assets/shaders/texture.glsl");
     }
@@ -71,6 +72,10 @@ public:
             m_CameraRotation += m_CameraRotationSpeed * ts;
         }
 
+        if (prism::Input::IsKeyPressed(PRISM_KEY_ESCAPE)) {
+            prism::Application::Instance().SetWindowState(false);
+        }
+
         prism::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
         prism::RenderCommand::Clear();
 
@@ -86,11 +91,15 @@ public:
     
         prism::Renderer::Submit(textureShader, m_SquareVA);
 
+        m_Logo->Bind();
+        prism::Renderer::Submit(textureShader, m_SquareVA, glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.0f)));
+
         prism::Renderer::EndScene();
     }
 
     void OnImGuiRender() override {
-
+        // static bool show = true;
+        // ImGui::ShowDemoWindow(&show);
     }
 
 
@@ -101,7 +110,7 @@ public:
 private:
     prism::ShaderLibrary m_ShaderLibrary;
     prism::Ref<prism::VertexArray> m_SquareVA;
-    prism::Ref<prism::Texture> m_Texture;
+    prism::Ref<prism::Texture> m_Texture, m_Logo;
     prism::OrthographicCamera m_Camera;
     glm::vec3 m_CameraPosition;
     float m_CameraMoveSpeed = 1.0f;
