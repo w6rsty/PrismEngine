@@ -31,6 +31,7 @@ private:
     bool m_Running = true;
     LayerStack m_LayerStack;
     float m_LastFrameTime = 0.0f;
+    bool m_Minimized = false;
 private:
     static Application* s_Instance;
 };

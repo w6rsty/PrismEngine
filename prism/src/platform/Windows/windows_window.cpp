@@ -1,4 +1,6 @@
 #include "platform/Windows/windows_window.hpp"
+#include "core/log_tag.hpp"
+#include "core/logger.hpp"
 #include "prism.hpp"
 #include "platform/Windows/windows_input.hpp"
 #include "platform/OpenGL/opengl_context.hpp"
@@ -42,7 +44,9 @@ void WindowsWindow::Init(const WindowProps& props) {
         WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         data.width = width;
         data.height = height;
+
         WindowResizeEvent event(width, height);
+        LOG_TRACE(log_tag::Window, "WindowResizeEvent: ", width, ", ", height);
         data.EventCallback(event);
     });
 

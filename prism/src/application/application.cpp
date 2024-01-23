@@ -1,6 +1,6 @@
 #include "application/application.hpp"
 #include "event/event.hpp"
-#include "renderer/render_command.hpp"
+#include "renderer/renderer.hpp"
 
 #include "GLFW/glfw3.h"
 
@@ -18,7 +18,7 @@ Application::Application() {
     m_Window = Scope<Window>(Window::Create());
     m_Window->SetEventCallback(BIND_APP_EVENT_FN(OnEvent));
 
-    RenderCommand::Init();
+    Renderer::Init();
 
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);
@@ -43,13 +43,13 @@ bool Application::OnWindowClose(WindowCloseEvent& event) {
 }
 
 bool Application::OnWindowResize(WindowResizeEvent& event) {
-    // if(event.GetWidth() == 0 || event.GetHeight() == 0) {
-    //     m_Minimized = true;
-    //     return false;
-    // }
+    if(event.GetWidth() == 0 || event.GetHeight() == 0) {
+        m_Minimized = true;
+        return false;
+    }
 
-    // m_Minimized = false;
-    RenderCommand::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
+    m_Minimized = false;
+    Renderer::OnWindowResize(event.GetWidth(), event.GetHeight());
     return false;
 }
 
@@ -59,7 +59,9 @@ void Application::Run() {
         Timestep timestep = time - m_LastFrameTime;
         m_LastFrameTime = time;
 
-        for (Layer* layer : m_LayerStack) { layer->OnUpdate(timestep); }
+        if (!m_Minimized) {
+            for (Layer* layer : m_LayerStack) { layer->OnUpdate(timestep); }
+        }
 
         m_ImGuiLayer->Begin();
         for (Layer* layer : m_LayerStack) { layer->OnImGuiRender(); }

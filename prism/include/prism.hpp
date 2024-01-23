@@ -9,6 +9,7 @@
 #include "event/key_event.hpp"
 #include "event/mouse_event.hpp"
 #include "event/application_event.hpp"
+#include "renderer/orthographic_camera_controller.hpp"
 
 #include "window/keycodes.hpp"
 #include "platform/Windows/windows_input.hpp"
