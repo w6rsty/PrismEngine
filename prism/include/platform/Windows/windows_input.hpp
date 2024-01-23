@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window/input.hpp"
+#include "core/window/input.hpp"
 
 namespace prism {
 

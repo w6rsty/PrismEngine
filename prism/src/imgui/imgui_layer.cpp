@@ -1,6 +1,6 @@
 #include "imgui/imgui_layer.hpp"
 
-#include "application/application.hpp"
+#include "core/application.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"

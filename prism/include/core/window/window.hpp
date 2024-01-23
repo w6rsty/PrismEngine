@@ -2,7 +2,7 @@
 
 #include <string>
 #include <functional>
-#include "event/event.hpp"
+#include "core/event/event.hpp"
 
 namespace prism {
 

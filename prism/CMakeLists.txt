@@ -1,12 +1,9 @@
 aux_source_directory(src/core prism_core_src)
 aux_source_directory(src prism_src)
-aux_source_directory(src/window prism_src)
 aux_source_directory(src/imgui prism_src)
 aux_source_directory(src/renderer prism_src)
 aux_source_directory(src/platform/Windows prism_src)
 aux_source_directory(src/platform/OpenGL prism_src)
-aux_source_directory(src/application prism_src)
-aux_source_directory(src/rhi/gl prism_src)
 
 file(GLOB_RECURSE prism_headers ./include/*.hpp)
 file(GLOB prism_shaders ./shaders/*.shader)

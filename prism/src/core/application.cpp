@@ -1,5 +1,5 @@
-#include "application/application.hpp"
-#include "event/event.hpp"
+#include "core/application.hpp"
+#include "core/event/event.hpp"
 #include "renderer/renderer.hpp"
 
 #include "GLFW/glfw3.h"

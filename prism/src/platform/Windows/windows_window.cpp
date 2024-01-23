@@ -1,7 +1,8 @@
 #include "platform/Windows/windows_window.hpp"
-#include "core/log_tag.hpp"
-#include "core/logger.hpp"
-#include "prism.hpp"
+#include "core/assert.hpp"
+#include "core/event/application_event.hpp"
+#include "core/event/key_event.hpp"
+#include "core/event/mouse_event.hpp"
 #include "platform/Windows/windows_input.hpp"
 #include "platform/OpenGL/opengl_context.hpp"
 

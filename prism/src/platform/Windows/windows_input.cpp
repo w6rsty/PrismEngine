@@ -1,6 +1,6 @@
 #include "platform/Windows/windows_input.hpp"
+#include "core/application.hpp"
 
-#include "application/application.hpp"
 #include "GLFW/glfw3.h"
 
 namespace prism {

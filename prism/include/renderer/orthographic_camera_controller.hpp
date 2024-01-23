@@ -2,8 +2,8 @@
 
 #include "renderer/camera.hpp"
 #include "core/timestep.hpp"
-#include "event/application_event.hpp"
-#include "event/mouse_event.hpp"
+#include "core/event/application_event.hpp"
+#include "core/event/mouse_event.hpp"
 
 #include "glm/glm.hpp"
 

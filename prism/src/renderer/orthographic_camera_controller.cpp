@@ -1,8 +1,8 @@
 #include "renderer/orthographic_camera_controller.hpp"
 #include "core/logger.hpp"
-#include "event/event.hpp"
-#include "window/keycodes.hpp"
-#include "window/input.hpp"
+#include "core/event/event.hpp"
+#include "core/window/keycodes.hpp"
+#include "core/window/input.hpp"
 #include "prism.hpp"
 
 #include "glad/glad.h"
