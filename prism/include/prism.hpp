@@ -17,10 +17,12 @@
 
 
 #include "renderer/orthographic_camera_controller.hpp"
+#include "renderer/renderer.hpp"
+#include "renderer/renderer2d.hpp"
+#include "renderer/orthographic_camera_controller.hpp"
 #include "renderer/buffer.hpp"
 #include "renderer/vertex_array.hpp"
 #include "renderer/shader.hpp"
-#include "renderer/renderer.hpp"
 #include "renderer/camera.hpp"
 #include "renderer/texture.hpp"
 

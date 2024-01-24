@@ -5,6 +5,7 @@
 
 #include "imgui.h"
 
+
 class AppLayer : public prism::Layer {
 public:
     AppLayer() 
@@ -54,7 +55,7 @@ public:
 
         auto textureShader = std::dynamic_pointer_cast<prism::OpenGLShader>(m_ShaderLibrary.Get("texture"));
         textureShader->Bind();
-        textureShader->SetUniformInt("u_Texture", 0);
+        textureShader->UploadUniformInt("u_Texture", 0);
         m_Texture->Bind();
 
         prism::Renderer::Submit(textureShader, m_SquareVA);
@@ -78,7 +79,8 @@ private:
 class Sandbox : public prism::Application {
 public:
     Sandbox() {
-        PushLayer(new AppLayer());
+        // PushLayer(new AppLayer());
+        PushLayer(new Sandbox2D());
     }
     ~Sandbox() {}
 };
