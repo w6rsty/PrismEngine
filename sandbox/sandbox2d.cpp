@@ -8,7 +8,7 @@
 Sandbox2D::Sandbox2D()
 : Layer("Sandbox2D"),
   m_CameraController(1920.0f / 1080.0f) {
-    m_Texture = prism::Texture2D::Create("../../assets/textures/Checkerboad.png");
+    m_Texture = prism::Texture2D::Create("../../assets/textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnAttach() {
@@ -27,8 +27,8 @@ void Sandbox2D::OnUpdate(prism::Timestep ts) {
 
     prism::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-    prism::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-    prism::Renderer2D::DrawQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, m_Texture);
+    prism::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.5f, 0.7f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+    prism::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f, }, { 1.0f, 1.0f }, m_Texture);
 
     prism::Renderer2D::EndScene();
 }
