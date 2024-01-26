@@ -88,10 +88,26 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, cons
     DrawQuad({ position.x, position.y, 0.0f }, size, color);
 }
 
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling) {
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
     
-    s_Data->shader->SetFloat4("u_Color", glm::vec4(1.0f));
+    s_Data->shader->SetFloat4("u_Color", color);
+    s_Data->whiteTexture->Bind();
+    glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position)) * glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
+    s_Data->shader->SetMat4("u_Transform", transform);
+
+    s_Data->quadVertexArray->Bind();
+    RenderCommand::DrawIndexed(s_Data->quadVertexArray);
+}
+
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color) {
+    DrawQuad({ position.x, position.y, 0.0f }, size, rotation, color);
+}
+
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
+    PRISM_PROFILE_FUNCTION();
+    
+    s_Data->shader->SetFloat4("u_Color", tintColor);
     s_Data->shader->SetFloat("u_TilingFactor", tiling);
     texture->Bind();
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
@@ -101,8 +117,25 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, cons
     RenderCommand::DrawIndexed(s_Data->quadVertexArray);
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling) {
-    DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling);
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
+    DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
+}
+
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
+    PRISM_PROFILE_FUNCTION();
+    
+    s_Data->shader->SetFloat4("u_Color", tintColor);
+    s_Data->shader->SetFloat("u_TilingFactor", tiling);
+    texture->Bind();
+    glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
+    s_Data->shader->SetMat4("u_Transform", transform);
+
+    s_Data->quadVertexArray->Bind();
+    RenderCommand::DrawIndexed(s_Data->quadVertexArray);
+}
+
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
+    DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tiling, tintColor);
 }
 
 } // namespace prism

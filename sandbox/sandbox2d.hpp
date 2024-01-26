@@ -18,5 +18,5 @@ public:
     virtual void OnImGuiRender() override;
 private:
     prism::OrthographicCameraController m_CameraController;
-    prism::Ref<prism::Texture> m_Texture; 
+    prism::Ref<prism::Texture> m_Texture;
 };
