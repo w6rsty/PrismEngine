@@ -1,1 +1,6 @@
-3rdlibs/* linguist-vendored
+3rdlibs/debugbreak/* linguist-vendored
+3rdlibs/glad/* linguist-vendored
+3rdlibs/glfw/* linguist-vendored
+3rdlibs/glm/* linguist-vendored
+3rdlibs/imgui/* linguist-vendored
+3rdlibs/stb_image/* linguist-vendored
