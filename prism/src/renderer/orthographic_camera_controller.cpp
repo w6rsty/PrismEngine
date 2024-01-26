@@ -17,6 +17,8 @@ OrthographicCameraController::OrthographicCameraController(float aspectRatio, bo
 }
 
 void OrthographicCameraController::OnUpdate(Timestep ts) {
+    PRISM_PROFILE_FUNCTION();
+
     if (Input::IsKeyPressed(PRISM_KEY_A)) {
         m_CameraPosition.x -= m_CameraTranslationSpeed * ts; 
     }

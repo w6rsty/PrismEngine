@@ -1,6 +1,7 @@
 #include "renderer/renderer.hpp"
 #include "platform/OpenGL/opengl_shader.hpp"
 #include "renderer/renderer2d.hpp"
+#include "core/core.hpp"
 
 #include <memory>
 
@@ -9,8 +10,16 @@ namespace prism {
 Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
 
 void Renderer::Init() {
+    PRISM_PROFILE_FUNCTION();
+
     RenderCommand::Init();
     Renderer2D::Init();
+}
+
+void Renderer::Shutdown() {
+    PRISM_PROFILE_FUNCTION();
+
+    Renderer2D::Shutdown();
 }
 
 void Renderer::OnWindowResize(uint32_t width, uint32_t height) {

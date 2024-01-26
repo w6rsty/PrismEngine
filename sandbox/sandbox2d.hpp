@@ -2,6 +2,11 @@
 
 #include "prism.hpp"
 
+struct ProfileResult {
+    const char* name;
+    float time;
+};
+
 class Sandbox2D : public prism::Layer {
 public:
     Sandbox2D();

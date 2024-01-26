@@ -1,12 +1,11 @@
 #include "renderer/renderer2d.hpp"
 
+#include "core/logger.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/vertex_array.hpp"
 #include "renderer/render_command.hpp"
 
 #include "glm/gtc/matrix_transform.hpp"
-
-#include <memory>
 
 namespace prism {
     
@@ -19,6 +18,8 @@ struct Render2DStorage {
 static Render2DStorage* s_Data;
 
 void Renderer2D::Init() {
+    PRISM_PROFILE_FUNCTION();
+
     s_Data = new Render2DStorage();
 
     float square_vertices[] = {
@@ -55,19 +56,25 @@ void Renderer2D::Init() {
 }
 
 void Renderer2D::Shutdown() {
+    PRISM_PROFILE_FUNCTION();
     delete s_Data;
 }
 
 void Renderer2D::BeginScene(const OrthographicCamera& camera) {
+    PRISM_PROFILE_FUNCTION();
+
     s_Data->shader->Bind();
     s_Data->shader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 }
 
 void Renderer2D::EndScene() {
+    PRISM_PROFILE_FUNCTION();
 
 }
 
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) {
+    PRISM_PROFILE_FUNCTION();
+    
     s_Data->shader->SetFloat4("u_Color", color);
     s_Data->whiteTexture->Bind();
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
@@ -81,8 +88,11 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, cons
     DrawQuad({ position.x, position.y, 0.0f }, size, color);
 }
 
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture) {
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling) {
+    PRISM_PROFILE_FUNCTION();
+    
     s_Data->shader->SetFloat4("u_Color", glm::vec4(1.0f));
+    s_Data->shader->SetFloat("u_TilingFactor", tiling);
     texture->Bind();
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
     s_Data->shader->SetMat4("u_Transform", transform);
@@ -91,8 +101,8 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, cons
     RenderCommand::DrawIndexed(s_Data->quadVertexArray);
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture) {
-    DrawQuad({ position.x, position.y, 0.0f }, size, texture);
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling) {
+    DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling);
 }
 
 } // namespace prism

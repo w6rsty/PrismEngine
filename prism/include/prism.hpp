@@ -15,7 +15,6 @@
 
 #include "platform/Windows/windows_input.hpp"
 
-
 #include "renderer/orthographic_camera_controller.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/renderer2d.hpp"
@@ -26,5 +25,6 @@
 #include "renderer/camera.hpp"
 #include "renderer/texture.hpp"
 
+#include "debug/instrumentor.hpp"
 
 #define PRISM_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include "core/log_tag.hpp"
 #include "core/assert.hpp"
+#include "core/core.hpp"
 
 #include "GLFW/glfw3.h"
 
@@ -14,6 +15,8 @@ OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
 }
 
 void OpenGLContext::Init() {
+    PRISM_PROFILE_FUNCTION();
+
     glfwMakeContextCurrent(m_WindowHandle);
     int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     PRISM_ASSERT(status, "Failed to initialize Glad", log_tag::Window);
@@ -23,6 +26,8 @@ void OpenGLContext::Init() {
 }
 
 void OpenGLContext::SwapBuffers() {
+    PRISM_PROFILE_FUNCTION();
+
     glfwSwapBuffers(m_WindowHandle);
 }
 

@@ -5,6 +5,7 @@
 #include "core/event/mouse_event.hpp"
 #include "platform/Windows/windows_input.hpp"
 #include "platform/OpenGL/opengl_context.hpp"
+#include "core/core.hpp"
 
 namespace prism {
 
@@ -19,20 +20,31 @@ Window* Window::Create(const WindowProps& props) {
 }
 
 WindowsWindow::WindowsWindow(const WindowProps& props) {
+    PRISM_PROFILE_FUNCTION();
+
     Init(props);
 }
 
 void WindowsWindow::Init(const WindowProps& props) {
+    PRISM_PROFILE_FUNCTION();
+
     m_Data.title = props.title;
     m_Data.width = props.width;
     m_Data.height = props.height;
     m_Data.vSync = true;
 
     LOG_INFO("EntryPoint", "==> ", props.title, " <==");
-    PRISM_ASSERT(glfwInit(), "Failed to initialize GLFW", log_tag::Window);
-
-    glfwSetErrorCallback(GLFWErrorCallback);
-    m_Window = glfwCreateWindow(props.width, props.height, props.title.c_str(), nullptr, nullptr);
+    
+    {
+        PRISM_PROFILE_SCOPE("glfwInit");
+        PRISM_ASSERT(glfwInit(), "Failed to initialize GLFW", log_tag::Window);
+        glfwSetErrorCallback(GLFWErrorCallback);
+    }
+    {
+        PRISM_PROFILE_SCOPE("glfwCreateWindow");
+        
+        m_Window = glfwCreateWindow(props.width, props.height, props.title.c_str(), nullptr, nullptr);
+    }
     PRISM_ASSERT(m_Window, "Failed to create GLFW window", log_tag::Window);
 
     m_Context = new OpenGLContext(m_Window);
@@ -112,11 +124,15 @@ WindowsWindow::~WindowsWindow() {
 }
 
 void WindowsWindow::Shutdown() {
+    PRISM_PROFILE_FUNCTION();
+
     glfwDestroyWindow(m_Window);
     glfwTerminate();
 }
 
 void WindowsWindow::OnUpdate() {
+    PRISM_PROFILE_FUNCTION();
+
     glfwPollEvents();
     m_Context->SwapBuffers();
 }
@@ -134,6 +150,8 @@ void WindowsWindow::SetEventCallback(const EventCallbackFn& callback) {
 }
 
 void WindowsWindow::SetVSync(bool enabled) {
+    PRISM_PROFILE_FUNCTION();
+
     m_Data.vSync = enabled;
     glfwSwapInterval(enabled ? 1 : 0);
 }

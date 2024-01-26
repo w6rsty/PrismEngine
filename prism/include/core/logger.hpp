@@ -141,12 +141,12 @@ private:
 } // namespace logger
 
 #ifdef ENABLE_LOG
-    #define LOG_TRACE(tag, ...)    logger::LoggerManager::Instance().GetDefault().Trace(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
-    #define LOG_INFO(tag, ...)     logger::LoggerManager::Instance().GetDefault().Info(    __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
-    #define LOG_DEBUG(tag, ...)    logger::LoggerManager::Instance().GetDefault().Debug(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
-    #define LOG_WARN(tag, ...)     logger::LoggerManager::Instance().GetDefault().Warn(    __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
-    #define LOG_ERROR(tag, ...)    logger::LoggerManager::Instance().GetDefault().Error(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
-    #define LOG_FATAL(tag, ...)    logger::LoggerManager::Instance().GetDefault().Fatal(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
+    #define LOG_TRACE(tag, ...)    ::logger::LoggerManager::Instance().GetDefault().Trace(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
+    #define LOG_INFO(tag, ...)     ::logger::LoggerManager::Instance().GetDefault().Info(    __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
+    #define LOG_DEBUG(tag, ...)    ::logger::LoggerManager::Instance().GetDefault().Debug(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
+    #define LOG_WARN(tag, ...)     ::logger::LoggerManager::Instance().GetDefault().Warn(    __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
+    #define LOG_ERROR(tag, ...)    ::logger::LoggerManager::Instance().GetDefault().Error(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
+    #define LOG_FATAL(tag, ...)    ::logger::LoggerManager::Instance().GetDefault().Fatal(   __FUNCTION__, __FILE__, __LINE__, "[" TAGCOL, tag, RESETCOL "]: ", ## __VA_ARGS__)
 #else
     #define LOG_TRACE(tag, ...)
     #define LOG_INFO(tag, ...)
