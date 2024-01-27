@@ -19,6 +19,7 @@ public:
     virtual uint32_t GetHeight() const override { return m_Height; }
 
     virtual void Bind(uint32_t slot = 0) const override;
+    virtual bool operator==(const Texture& other) override;
 private:
     uint32_t m_RendererID;
     uint32_t m_Width, m_Height;
