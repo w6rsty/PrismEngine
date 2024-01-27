@@ -6,6 +6,18 @@
 
 namespace prism {
 
+Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
+        switch (Renderer::GetAPI()) {
+        case RendererAPI::API::None: {
+            PRISM_CORE_ASSERT(false, "RendererAPI::None is not supported!");
+            return nullptr;
+        }
+        case RendererAPI::API::OpenGL: return CreateRef<OpenGLVertexBuffer>(size);
+    }
+
+    return nullptr;
+}
+
 Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
     switch (Renderer::GetAPI()) {
         case RendererAPI::API::None: {

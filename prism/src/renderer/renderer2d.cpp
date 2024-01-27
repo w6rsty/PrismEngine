@@ -1,5 +1,6 @@
 #include "renderer/renderer2d.hpp"
 
+#include "core/core.hpp"
 #include "core/logger.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/vertex_array.hpp"
@@ -9,79 +10,129 @@
 
 namespace prism {
     
-struct Render2DStorage {
-    Ref<VertexArray> quadVertexArray;
-    Ref<Shader> shader;
-    Ref<Texture> whiteTexture;
+struct QuadVertex {
+    glm::vec3 position;
+    glm::vec4 color;
+    glm::vec2 texCoord;
 };
 
-static Render2DStorage* s_Data;
+struct Render2DData {
+    const uint32_t maxQuads = 10000;
+    const uint32_t maxVertices = maxQuads * 4;
+    const uint32_t maxIndices = maxQuads * 6;
+
+    Ref<VertexArray> quadVertexArray;
+    Ref<VertexBuffer> quadVertexBuffer;
+    Ref<Shader> shader;
+    Ref<Texture> whiteTexture;
+
+    uint32_t quadIndexCount = 0;
+    QuadVertex* quadVertexBufferBase = nullptr;
+    QuadVertex* quadVertexBufferPtr = nullptr;
+};
+
+static Render2DData s_Data;
+
 
 void Renderer2D::Init() {
     PRISM_PROFILE_FUNCTION();
 
-    s_Data = new Render2DStorage();
+    s_Data.quadVertexArray = VertexArray::Create();
 
-    float square_vertices[] = {
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // 0
-         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 1
-         0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // 2
-        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // 3
-    };
-    BufferLayout layout = {
-        { ShaderDataType::Float3, "a_Position" },
-        { ShaderDataType::Float2, "a_TexCoord" },
-    };
-    uint32_t square_indices[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
+    {
+        PRISM_PROFILE_SCOPE("Renderer2D::Init::VertexBuffer");        
+        s_Data.quadVertexBuffer = VertexBuffer::Create(s_Data.maxVertices * sizeof(QuadVertex));
+        s_Data.quadVertexBuffer->SetLayout({
+            { ShaderDataType::Float3, "a_Position" },
+            { ShaderDataType::Float4, "a_Color" },
+            { ShaderDataType::Float2, "a_TexCoord" },
+        });
+        s_Data.quadVertexArray->AddVertexBuffer(s_Data.quadVertexBuffer);
+    }
 
-    s_Data->quadVertexArray = VertexArray::Create();
+    {
+        PRISM_PROFILE_SCOPE("Renderer2D::Init::IndexBuffer");
+        s_Data.quadVertexBufferBase = new QuadVertex[s_Data.maxVertices];
+        uint32_t* quadIndices = new uint32_t[s_Data.maxIndices];
+        uint32_t offset = 0;
+        for (uint32_t i = 0; i < s_Data.maxIndices; i+=6) {
+            quadIndices[i + 0] = offset + 0;
+            quadIndices[i + 1] = offset + 1;
+            quadIndices[i + 2] = offset + 2;
+            quadIndices[i + 3] = offset + 2;
+            quadIndices[i + 4] = offset + 3;
+            quadIndices[i + 5] = offset + 0;
 
-    Ref<VertexBuffer> squareVB;
-    squareVB = VertexBuffer::Create(square_vertices, sizeof(square_vertices));
-    squareVB->SetLayout(layout);
-    s_Data->quadVertexArray->AddVertexBuffer(squareVB);
-    Ref<IndexBuffer> squareIB = IndexBuffer::Create(square_indices, sizeof(square_indices) / sizeof(uint32_t));
-    s_Data->quadVertexArray->SetIndexBuffer(squareIB);
+            offset += 4;
+        }
+        Ref<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.maxIndices);
+        s_Data.quadVertexArray->SetIndexBuffer(quadIB);
+        delete [] quadIndices;
+    }
 
-    s_Data->whiteTexture = Texture2D::Create(1, 1);
+    s_Data.whiteTexture = Texture2D::Create(1, 1);
     uint32_t whiteTextureData = 0xffffffff;
-    s_Data->whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+    s_Data.whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-    s_Data->shader = Shader::Create("../../assets/shaders/shader.glsl");
-    s_Data->shader->Bind();
-    s_Data->shader->SetInt("u_Texture", 0);
+    s_Data.shader = Shader::Create("../../assets/shaders/shader.glsl");
+    s_Data.shader->Bind();
+    s_Data.shader->SetInt("u_Texture", 0);
 }
 
 void Renderer2D::Shutdown() {
     PRISM_PROFILE_FUNCTION();
-    delete s_Data;
+
 }
 
 void Renderer2D::BeginScene(const OrthographicCamera& camera) {
     PRISM_PROFILE_FUNCTION();
 
-    s_Data->shader->Bind();
-    s_Data->shader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+    s_Data.shader->Bind();
+    s_Data.shader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+
+    s_Data.quadIndexCount = 0;
+    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
 }
 
 void Renderer2D::EndScene() {
     PRISM_PROFILE_FUNCTION();
 
+    uint32_t dataSize = (uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase;
+    s_Data.quadVertexBuffer->SetData(s_Data.quadVertexBufferBase, dataSize);
+
+    Flush();
+}
+
+void Renderer2D::Flush() {
+    PRISM_PROFILE_FUNCTION();
+
+    RenderCommand::DrawIndexed(s_Data.quadVertexArray, s_Data.quadIndexCount);
 }
 
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
     
-    s_Data->shader->SetFloat4("u_Color", color);
-    s_Data->whiteTexture->Bind();
-    glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
-    s_Data->shader->SetMat4("u_Transform", transform);
+    s_Data.quadVertexBufferPtr->position = position;
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 0.0f, 0.0f };
+    s_Data.quadVertexBufferPtr++;
 
-    s_Data->quadVertexArray->Bind();
-    RenderCommand::DrawIndexed(s_Data->quadVertexArray);
+    s_Data.quadVertexBufferPtr->position = { position.x + size.x, position.y, position.z};
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 1.0f, 0.0f };
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->position = { position.x + size.x, position.y + size.y, position.z };
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 1.0f, 1.0f };
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->position = { position.x, position.y + size.y, position.z};
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 0.0f, 1.0f };
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadIndexCount += 6;
 }
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color) {
@@ -91,13 +142,34 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, cons
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
     
-    s_Data->shader->SetFloat4("u_Color", color);
-    s_Data->whiteTexture->Bind();
-    glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position)) * glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
-    s_Data->shader->SetMat4("u_Transform", transform);
+    s_Data.quadVertexBufferPtr->position = position;
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 0.0f, 0.0f };
+    s_Data.quadVertexBufferPtr++;
 
-    s_Data->quadVertexArray->Bind();
-    RenderCommand::DrawIndexed(s_Data->quadVertexArray);
+    s_Data.quadVertexBufferPtr->position = { position.x + size.x, position.y, position.z};
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 1.0f, 0.0f };
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->position = { position.x + size.x, position.y + size.y, position.z };
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 1.0f, 1.0f };
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->position = { position.x, position.y + size.y, position.z};
+    s_Data.quadVertexBufferPtr->color = color;
+    s_Data.quadVertexBufferPtr->texCoord = { 0.0f, 1.0f };
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadIndexCount += 6;
+
+    s_Data.whiteTexture->Bind();
+    glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position)) * glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
+    s_Data.shader->SetMat4("u_Transform", transform);
+
+    s_Data.quadVertexArray->Bind();
+    RenderCommand::DrawIndexed(s_Data.quadVertexArray);
 }
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color) {
@@ -107,14 +179,14 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, floa
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
     PRISM_PROFILE_FUNCTION();
     
-    s_Data->shader->SetFloat4("u_Color", tintColor);
-    s_Data->shader->SetFloat("u_TilingFactor", tiling);
+    s_Data.shader->SetFloat4("u_Color", tintColor);
+    s_Data.shader->SetFloat("u_TilingFactor", tiling);
     texture->Bind();
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
-    s_Data->shader->SetMat4("u_Transform", transform);
+    s_Data.shader->SetMat4("u_Transform", transform);
 
-    s_Data->quadVertexArray->Bind();
-    RenderCommand::DrawIndexed(s_Data->quadVertexArray);
+    s_Data.quadVertexArray->Bind();
+    RenderCommand::DrawIndexed(s_Data.quadVertexArray);
 }
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
@@ -124,14 +196,14 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, cons
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
     PRISM_PROFILE_FUNCTION();
     
-    s_Data->shader->SetFloat4("u_Color", tintColor);
-    s_Data->shader->SetFloat("u_TilingFactor", tiling);
+    s_Data.shader->SetFloat4("u_Color", tintColor);
+    s_Data.shader->SetFloat("u_TilingFactor", tiling);
     texture->Bind();
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(size, 1.0f)));
-    s_Data->shader->SetMat4("u_Transform", transform);
+    s_Data.shader->SetMat4("u_Transform", transform);
 
-    s_Data->quadVertexArray->Bind();
-    RenderCommand::DrawIndexed(s_Data->quadVertexArray);
+    s_Data.quadVertexArray->Bind();
+    RenderCommand::DrawIndexed(s_Data.quadVertexArray);
 }
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
