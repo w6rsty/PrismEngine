@@ -17,6 +17,10 @@ public:
     virtual void OnEvent(prism::Event& event) override;
     virtual void OnImGuiRender() override;
 private:
+    float m_Time = 0.0f;
+    int32_t m_FrameCount = 0;
+    float m_FPS = 0.0f;
+
     prism::OrthographicCameraController m_CameraController;
     prism::Ref<prism::Texture> m_Texture;
     prism::Ref<prism::Texture> m_BackgroundTexture;

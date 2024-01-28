@@ -6,6 +6,7 @@ class Sandbox : public prism::Application {
 public:
     Sandbox() {
         PushLayer(new Sandbox2D());
+        GetWindow().SetVSync(false);
     }
     ~Sandbox() {}
 };
