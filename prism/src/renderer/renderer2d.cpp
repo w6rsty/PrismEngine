@@ -22,9 +22,9 @@ struct QuadVertex {
 };
 
 struct Render2DData {
-    const uint32_t maxQuads = 10000;
-    const uint32_t maxVertices = maxQuads * 4;
-    const uint32_t maxIndices = maxQuads * 6;
+    static const uint32_t maxQuads = 128;
+    static const uint32_t maxVertices = maxQuads * 4;
+    static const uint32_t maxIndices = maxQuads * 6;
     static const uint32_t maxTextureSlots = 32;
 
     Ref<VertexArray> quadVertexArray;
@@ -40,10 +40,11 @@ struct Render2DData {
     uint32_t textureSlotIndex = 1;
 
     glm::vec4 quadVertexPositions[4];
+
+    Renderer2D::Statistics stats;
 };
 
 static Render2DData s_Data;
-
 
 void Renderer2D::Init() {
     PRISM_PROFILE_FUNCTION();
@@ -127,6 +128,8 @@ void Renderer2D::EndScene() {
     s_Data.quadVertexBuffer->SetData(s_Data.quadVertexBufferBase, dataSize);
 
     Flush();
+
+    s_Data.stats.drawCalls++;
 }
 
 void Renderer2D::Flush() {
@@ -139,8 +142,21 @@ void Renderer2D::Flush() {
     RenderCommand::DrawIndexed(s_Data.quadVertexArray, s_Data.quadIndexCount);
 }
 
+static void FlushAndReset() {
+    Renderer2D::EndScene();
+
+    s_Data.quadIndexCount = 0;
+    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
+
+    s_Data.textureSlotIndex = 1;
+}
+
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
+
+    if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
+        FlushAndReset();
+    }
     
     constexpr float textureIndex = 0.0f;
 
@@ -178,16 +194,21 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, cons
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadIndexCount += 6;
+
+    s_Data.stats.quadCount++;
 }
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color) {
     DrawQuad({ position.x, position.y, 0.0f }, size, color);
 }
 
-
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
     PRISM_PROFILE_FUNCTION();
     
+    if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
+        FlushAndReset();
+    }
+
     constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     float textureIndex = 0.0f;
@@ -238,6 +259,8 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, cons
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadIndexCount += 6;
+
+    s_Data.stats.quadCount++;
 }
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
@@ -247,6 +270,10 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, cons
 void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
     
+    if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
+        FlushAndReset();
+    }
+
     constexpr float textureIndex = 0.0f;
 
     float tilingFactor = 1.0f;
@@ -284,6 +311,8 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& siz
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadIndexCount += 6;
+
+    s_Data.stats.quadCount++;
 }
 
 void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color) {
@@ -293,6 +322,10 @@ void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& siz
 void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
     PRISM_PROFILE_FUNCTION();
     
+    if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
+        FlushAndReset();
+    }
+
     constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     float textureIndex = 0.0f;
@@ -344,10 +377,20 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& siz
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadIndexCount += 6;
+
+    s_Data.stats.quadCount++;
 }
 
 void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling, const glm::vec4& tintColor) {
     DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tiling, tintColor);
+}
+
+Renderer2D::Statistics Renderer2D::GetStats() {
+    return s_Data.stats;
+}
+
+void Renderer2D::ReSetStats() {
+    memset(&s_Data.stats, 0, sizeof(Statistics));
 }
 
 } // namespace prism

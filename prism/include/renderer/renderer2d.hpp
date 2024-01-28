@@ -23,6 +23,17 @@ public:
     static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color);
     static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
     static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
+
+    struct Statistics {
+        uint32_t drawCalls = 0;
+        uint32_t quadCount = 0;
+
+        uint32_t GetTotalVertexCount() { return quadCount * 4; }
+        uint32_t GetTotalIndexCount() { return quadCount * 6; }
+    };
+
+    static Statistics GetStats();
+    static void ReSetStats();
 };
 
 } // namespace prism
