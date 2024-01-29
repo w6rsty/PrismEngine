@@ -1,6 +1,7 @@
 file(GLOB_RECURSE SANDBOX_SRC
     "sandbox.cpp"
     "sandbox2d.cpp"
+    "particle_system.cpp"
 )
 
 add_executable(sandbox ${SANDBOX_SRC})

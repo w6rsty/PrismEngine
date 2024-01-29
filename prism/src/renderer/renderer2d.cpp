@@ -22,7 +22,7 @@ struct QuadVertex {
 };
 
 struct Render2DData {
-    static const uint32_t maxQuads = 128;
+    static const uint32_t maxQuads = 1024;
     static const uint32_t maxVertices = maxQuads * 4;
     static const uint32_t maxIndices = maxQuads * 6;
     static const uint32_t maxTextureSlots = 32;

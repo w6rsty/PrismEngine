@@ -6,6 +6,6 @@ imgui.ini
 compile_commands.json
 
 assets/fonts/*
-
+!assets/fonts/JetBrainsMonoNerdFontMono-SemiBold.ttf
 !.gitignore
 !.gitattributes

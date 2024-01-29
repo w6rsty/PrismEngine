@@ -11,7 +11,7 @@
 
 namespace prism {
 
-#define PRISM_PROFILE 1
+#define PRISM_PROFILE 0
 
 using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
