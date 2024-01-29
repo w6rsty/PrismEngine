@@ -25,6 +25,7 @@
 #include "renderer/shader.hpp"
 #include "renderer/camera.hpp"
 #include "renderer/texture.hpp"
+#include "renderer/subtexture2d.hpp"
 
 #include "debug/instrumentor.hpp"
 

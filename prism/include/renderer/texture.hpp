@@ -8,6 +8,13 @@
 
 namespace prism {
 
+enum class TextureWrap {
+    None = 0,
+    Repeat = 1,
+    MirroredRepeat = 2,
+    ClampToEdge = 3
+};
+
 class Texture {
 public:
     virtual ~Texture() {};
@@ -15,8 +22,9 @@ public:
     virtual uint32_t GetWidth() const = 0;
     virtual uint32_t GetHeight() const = 0;
 
-    virtual void SetData(void* data, uint32_t size) = 0;
+    virtual void SetWrap(TextureWrap wrap) = 0;
 
+    virtual void SetData(void* data, uint32_t size) = 0;
     virtual void Bind(uint32_t slot  = 0) const = 0;
 
     virtual bool operator==(const Texture& other) = 0;

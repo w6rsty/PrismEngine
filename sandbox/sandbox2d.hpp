@@ -1,7 +1,6 @@
 #pragma once
 
 #include "prism.hpp"
-#include "particle_system.hpp"
 
 struct ProfileResult {
     const char* name;
@@ -14,18 +13,17 @@ public:
     virtual void OnAttach() override;
     virtual void OnDetach() override;
 
-        virtual void OnUpdate(prism::Timestep ts) override;
-        virtual void OnEvent(prism::Event& event) override;
-        virtual void OnImGuiRender() override;
-    private:
-        float m_Time = 0.0f;
-        int32_t m_FrameCount = 0;
-        float m_FPS = 0.0f;
+    virtual void OnUpdate(prism::Timestep ts) override;
+    virtual void OnEvent(prism::Event& event) override;
+    virtual void OnImGuiRender() override;
+private:
+    float m_Time = 0.0f;
+    int32_t m_FrameCount = 0;
+    float m_FPS = 0.0f;
 
-        prism::OrthographicCameraController m_CameraController;
-        prism::Ref<prism::Texture> m_Texture;
-        prism::Ref<prism::Texture> m_BackgroundTexture;
-        ParticleSystem m_ParticleSystem{ 10000 };
-        ParticleProps m_Particle;
-        int32_t m_ParticleCount = 0;
+    prism::OrthographicCameraController m_CameraController;
+    prism::Ref<prism::Texture> m_SpriteSheet;
+    prism::Ref<prism::SubTexture2D> m_TextureAxe;
+    prism::Ref<prism::SubTexture2D> m_TextureYellowTree;
+    prism::Ref<prism::SubTexture2D> m_TextureGreenTree;
 };

@@ -41,6 +41,8 @@ void ParticleSystem::OnRender() {
         float size = glm::lerp(particle.sizeEnd, particle.sizeBegin, life);
         glm::vec3 position = { particle.position.x, particle.position.y, particle.position.z };
         prism::Renderer2D::DrawRotatedQuad(position, { size, size }, particle.rotation, color);
+
+        particle.rotationSpeed = glm::lerp(0.0f, particle.rotationBegin, life);
     }
 }
 
@@ -49,7 +51,8 @@ void ParticleSystem::Emit(const ParticleProps& particleProps) {
     particle.active = true;
     particle.position = particleProps.position;
     particle.rotation = prism::Random::Float() * 2.0f * glm::pi<float>();
-    particle.rotationSpeed = particleProps.rotationSpeed;
+    particle.rotationBegin= particleProps.rotationBegin;
+    particle.rotationSpeed = particleProps.rotationBegin;
 
     particle.velocity = particleProps.velocity;
     particle.velocity.x += particleProps.velocityVariation.x * prism::Random::UnitFloat();

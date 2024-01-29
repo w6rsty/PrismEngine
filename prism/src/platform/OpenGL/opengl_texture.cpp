@@ -5,6 +5,17 @@
 
 namespace prism {
 
+static uint32_t TextureWrapToOpenGL(TextureWrap wrap) {
+    switch (wrap) {
+        case TextureWrap::None: return GL_NONE;
+        case TextureWrap::Repeat: return GL_REPEAT;
+        case TextureWrap::MirroredRepeat: return GL_MIRRORED_REPEAT;
+        case TextureWrap::ClampToEdge: return GL_CLAMP_TO_EDGE;
+    }
+    PRISM_CORE_ASSERT(false, "Unknown texture wrap!");
+    return 0;
+}
+
 OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
 : m_Width(width), m_Height(height){
     PRISM_PROFILE_FUNCTION();
@@ -62,6 +73,15 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
     glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 
     stbi_image_free(data);
+}
+
+void OpenGLTexture2D::SetWrap(TextureWrap wrap) {
+    PRISM_PROFILE_FUNCTION();
+
+    uint32_t glWrap = TextureWrapToOpenGL(wrap);
+
+    glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, glWrap);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, glWrap);
 }
 
 void OpenGLTexture2D::SetData(void* data, uint32_t size) {
