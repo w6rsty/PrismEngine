@@ -26,6 +26,7 @@
 #include "renderer/camera.hpp"
 #include "renderer/texture.hpp"
 #include "renderer/subtexture2d.hpp"
+#include "renderer/frame_buffer.hpp"
 
 #include "debug/instrumentor.hpp"
 

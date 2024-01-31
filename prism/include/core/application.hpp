@@ -14,6 +14,7 @@ public:
     virtual ~Application();
 
     void Run();
+    void Close();
     void OnEvent(Event& event);
 
     void PushLayer(Layer* layer);
@@ -27,11 +28,13 @@ private:
     bool OnWindowResize(WindowResizeEvent& event);
 private:
     Scope<Window> m_Window;
-    ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
     LayerStack m_LayerStack;
     float m_LastFrameTime = 0.0f;
     bool m_Minimized = false;
+#ifdef PRISM_IMGUI
+    ImGuiLayer* m_ImGuiLayer;
+#endif
 private:
     static Application* s_Instance;
 };

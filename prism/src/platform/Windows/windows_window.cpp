@@ -59,7 +59,6 @@ void WindowsWindow::Init(const WindowProps& props) {
         data.height = height;
 
         WindowResizeEvent event(width, height);
-        LOG_TRACE(log_tag::Window, "WindowResizeEvent: ", width, ", ", height);
         data.EventCallback(event);
     });
 

@@ -18,3 +18,5 @@ endif()
 
 option(ENABLE_LOG "Enable log" ON)
 option(ENABLE_ASSERTION "Enable assert" ON)
+option(ENABLE_PROFILING "Enable profiling" OFF)
+option(ENABLE_IMGUI "Enable imgui" ON)

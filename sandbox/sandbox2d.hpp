@@ -2,6 +2,8 @@
 
 #include "prism.hpp"
 
+#include "particle_system.hpp"
+
 struct ProfileResult {
     const char* name;
     float time;
@@ -22,8 +24,10 @@ private:
     float m_FPS = 0.0f;
 
     prism::OrthographicCameraController m_CameraController;
-    prism::Ref<prism::Texture> m_SpriteSheet;
-    prism::Ref<prism::SubTexture2D> m_TextureAxe;
-    prism::Ref<prism::SubTexture2D> m_TextureYellowTree;
-    prism::Ref<prism::SubTexture2D> m_TextureGreenTree;
+
+    ParticleSystem m_ParticleSystem { 2000 };
+    ParticleProps m_Particle;
+    uint32_t m_ParticleCount = 0;
+
+    prism::Ref<prism::FrameBuffer> m_FrameBuffer;
 };

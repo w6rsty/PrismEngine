@@ -11,6 +11,7 @@ static uint32_t TextureWrapToOpenGL(TextureWrap wrap) {
         case TextureWrap::Repeat: return GL_REPEAT;
         case TextureWrap::MirroredRepeat: return GL_MIRRORED_REPEAT;
         case TextureWrap::ClampToEdge: return GL_CLAMP_TO_EDGE;
+        case TextureWrap::ClampToBorder: return GL_CLAMP_TO_BORDER;
     }
     PRISM_CORE_ASSERT(false, "Unknown texture wrap!");
     return 0;

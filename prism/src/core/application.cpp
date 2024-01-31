@@ -22,8 +22,10 @@ Application::Application() {
 
     Renderer::Init();
 
+#ifdef PRISM_IMGUI
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);
+#endif
 }
 
 Application::~Application() {
@@ -82,17 +84,20 @@ void Application::Run() {
                 }
             }
         }
-
+#ifdef PRISM_IMGUI
+        m_ImGuiLayer->Begin();
         {
             PRISM_PROFILE_SCOPE("LayerStack OnImGuiRender");
-            
-            m_ImGuiLayer->Begin();
             for (Layer* layer : m_LayerStack) { layer->OnImGuiRender(); }
-            m_ImGuiLayer->End();
         }
-
+        m_ImGuiLayer->End();
+#endif
         m_Window->OnUpdate();
     }
+}
+
+void Application::Close() {
+    m_Running = false;
 }
 
 void Application::PushLayer(Layer* layer) {

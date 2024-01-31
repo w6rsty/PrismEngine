@@ -10,9 +10,10 @@ namespace prism {
 
 enum class TextureWrap {
     None = 0,
-    Repeat = 1,
-    MirroredRepeat = 2,
-    ClampToEdge = 3
+    Repeat,
+    MirroredRepeat,
+    ClampToEdge,
+    ClampToBorder
 };
 
 class Texture {
@@ -21,6 +22,7 @@ public:
 
     virtual uint32_t GetWidth() const = 0;
     virtual uint32_t GetHeight() const = 0;
+    virtual uint32_t GetRendererID() const = 0;
 
     virtual void SetWrap(TextureWrap wrap) = 0;
 
