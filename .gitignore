@@ -9,3 +9,4 @@ assets/fonts/*
 !assets/fonts/JetBrainsMonoNerdFontMono-SemiBold.ttf
 !.gitignore
 !.gitattributes
+editor/assets/textures/body.png

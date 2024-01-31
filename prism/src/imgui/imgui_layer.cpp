@@ -51,6 +51,10 @@ void ImGuiLayer::OnDetach() {
     ImGui::DestroyContext();
 }
 
+void ImGuiLayer::OnEvent(Event& event) {
+
+}
+
 void ImGuiLayer::Begin() {
     PRISM_PROFILE_FUNCTION();
 

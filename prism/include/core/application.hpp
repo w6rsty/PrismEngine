@@ -10,7 +10,7 @@ namespace prism {
 
 class Application {
 public:
-    Application();
+    Application(const std::string& name = "Prism");
     virtual ~Application();
 
     void Run();

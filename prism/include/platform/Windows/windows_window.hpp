@@ -14,8 +14,8 @@ public:
 
     virtual void OnUpdate() override;
     
-    virtual unsigned int GetWidth() const override;
-    virtual unsigned int GetHeight() const override;
+    virtual uint32_t GetWidth() const override;
+    virtual uint32_t GetHeight() const override;
 
     virtual void SetEventCallback(const EventCallbackFn& callback) override;
     virtual void SetVSync(bool enabled) override;
@@ -31,8 +31,8 @@ private:
 
     struct WindowData {
         std::string title;
-        unsigned int width;
-        unsigned int height;
+        uint32_t width;
+        uint32_t height;
         bool vSync;
 
         EventCallbackFn EventCallback;

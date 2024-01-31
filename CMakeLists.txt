@@ -8,6 +8,7 @@ project(PrismEngine
 add_subdirectory(3rdlibs)
 add_subdirectory(prism)
 add_subdirectory(sandbox)
+add_subdirectory(editor)
 
 option(PRISM_BUILD_UNIT_TEST "Build unit test" OFF)
 if (PRISM_BUILD_UNIT_TEST)

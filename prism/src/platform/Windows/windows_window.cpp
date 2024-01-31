@@ -136,11 +136,11 @@ void WindowsWindow::OnUpdate() {
     m_Context->SwapBuffers();
 }
     
-unsigned int WindowsWindow::GetWidth() const {
+uint32_t WindowsWindow::GetWidth() const {
     return m_Data.width;
 }
 
-unsigned int WindowsWindow::GetHeight() const {
+uint32_t WindowsWindow::GetHeight() const {
     return m_Data.height;
 }
 

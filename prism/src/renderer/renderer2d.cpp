@@ -405,6 +405,16 @@ void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& siz
     DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, subTexture, tiling, tintColor);
 }
 
+void Renderer2D::DrawTexture(const glm::vec3& position, const Ref<Texture>& texture, float scale, float tiling, const glm::vec4& tintColor) {
+    PRISM_PROFILE_FUNCTION();
+    
+    DrawQuad(position, { (float)texture->GetWidth() * scale, (float)texture->GetHeight() * scale }, texture, tiling, tintColor);
+}
+
+void Renderer2D::DrawTexture(const glm::vec2& position, const Ref<Texture>& texture, float scale, float tiling, const glm::vec4& tintColor) {
+    DrawTexture({ position.x, position.y, 0.0f }, texture, scale, tiling, tintColor);
+}
+
 Renderer2D::Statistics Renderer2D::GetStats() {
     return s_Data.stats;
 }
