@@ -1,5 +1,6 @@
 #include "editor_layer.hpp"
 
+#include "core/application.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 
@@ -14,16 +15,6 @@ EditorLayer::EditorLayer()
 void EditorLayer::OnAttach() {
     m_CheckerboardTexture = Texture2D::Create("../../editor/assets/textures/Checkerboard.png");
 	
-    m_Particle.colorBegin = { 1.0, 137 / 255.0f, 0.0f, 1.0f};
-	m_Particle.colorEnd = { 0.0f, 1.0f, 177 / 255.0f, 1.0f};
-	m_Particle.sizeBegin = 1.0f;
-	m_Particle.sizeEnd = 0.0f;
-	m_Particle.sizeVariation = 0.3f;
-	m_Particle.lifeTime = 1.2f;
-	m_Particle.velocityVariation = { 1.5f, 1.2f, 0.0f };
-	m_Particle.rotationBegin = 10.0f;
-	m_ParticleCount = 4; 
-
     FrameBufferSpecification fbSpec;
     fbSpec.width = 1280;
     fbSpec.height = 720;
@@ -45,19 +36,10 @@ void EditorLayer::OnUpdate(Timestep ts) {
         m_Time = 0.0f;
     }
 
-    if (prism::Input::IsMouseButtonPressed(PRISM_MOUSE_BUTTON_1)) {
-		auto [x, y] = prism::Input::GetMousePosition();
-		x = (x / prism::Application::Instance().GetWindow().GetWidth()) * 2.0f - 1.0f;
-		y = 1.0f - (y / prism::Application::Instance().GetWindow().GetHeight()) * 2.0f;
-		auto pos = glm::inverse(m_CameraController.GetCamera().GetViewProjectionMatrix()) * glm::vec4(x, y, -1.0f, 1.0f);
-		m_Particle.position = { pos.x, pos.y, 0.1f };
-		for (int i = 0; i < m_ParticleCount; i++) {
-			m_ParticleSystem.Emit(m_Particle);
-		}
-	}
+    if (m_ViewportFocused) {
+        m_CameraController.OnUpdate(ts);
+    }
 
-    m_CameraController.OnUpdate(ts);
-    m_ParticleSystem.OnUpdate(ts);
     Renderer2D::ReSetStats();
 
     {
@@ -72,10 +54,10 @@ void EditorLayer::OnUpdate(Timestep ts) {
         Renderer2D::BeginScene(m_CameraController.GetCamera());
 
         Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_CheckerboardTexture);
-        m_ParticleSystem.OnRender();
 
         Renderer2D::EndScene();
         m_FrameBuffer->Unbind();
+        RenderCommand::Clear();
     }
 }
 
@@ -108,7 +90,7 @@ void EditorLayer::OnImGuiRender() {
         window_flags |= ImGuiWindowFlags_NoBackground;
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+    ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
     ImGui::PopStyleVar();
 
     if (opt_fullscreen)
@@ -143,36 +125,29 @@ void EditorLayer::OnImGuiRender() {
     ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
     ImGui::End();
-
+    
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Viewport");
+
+    m_ViewportFocused = ImGui::IsWindowFocused();
+    m_ViewportHovered = ImGui::IsWindowHovered();
+    Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize) {
-        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+
+
+
+    if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize && viewportPanelSize.x > 0 && viewportPanelSize.y > 0) {
         // m_FrameBuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
+        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
         m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
     }
+
     uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
     ImGui::Image((void*)textureID, { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
     
     ImGui::End();
     ImGui::PopStyleVar();
-
-    static bool show = true;
-    ImGui::ShowDemoWindow(&show);
-
-    ImGui::Begin("Settings");
-    ImGui::ColorEdit4("Color begin", glm::value_ptr(m_Particle.colorBegin));
-    ImGui::ColorEdit4("Color end", glm::value_ptr(m_Particle.colorEnd));
-    ImGui::SliderFloat("Size begin", &m_Particle.sizeBegin, 0.0f, 1.0f);
-    ImGui::SliderFloat("Size end", &m_Particle.sizeEnd, 0.0f, 1.0f);
-    ImGui::SliderFloat("Size variation", &m_Particle.sizeVariation, 0.0f, 2.0f);
-    ImGui::SliderFloat("Life time", &m_Particle.lifeTime, 0.0f, 5.0f);
-    ImGui::SliderFloat2("Velocity variation", glm::value_ptr(m_Particle.velocityVariation), 0.0f, 5.0f);
-    ImGui::SliderFloat("Rotation begin", &m_Particle.rotationBegin, 0.0f, 360.0f);
-    ImGui::SliderInt("Particle count", (int*)&m_ParticleCount, 0, 20);
-
-    ImGui::End();
 
     ImGui::End();
 }

@@ -1,5 +1,7 @@
 #include "core/application.hpp"
 #include "core/event/event.hpp"
+#include "core/log_tag.hpp"
+#include "core/logger.hpp"
 #include "renderer/renderer.hpp"
 
 #include "GLFW/glfw3.h"
@@ -39,9 +41,11 @@ void Application::OnEvent(Event& event) {
     dispatcher.Dispatch<WindowCloseEvent>(BIND_APP_EVENT_FN(OnWindowClose));
     dispatcher.Dispatch<WindowResizeEvent>(BIND_APP_EVENT_FN(OnWindowResize));
 
-    for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
-        (*--it)->OnEvent(event);
-        if(event.m_Handled) { break; }
+    for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it) {
+        if(event.m_Handled) { 
+            break; 
+        }
+        (*it)->OnEvent(event);
     }
 }
 
@@ -56,6 +60,7 @@ bool Application::OnWindowResize(WindowResizeEvent& event) {
     PRISM_PROFILE_FUNCTION();
 
     if(event.GetWidth() == 0 || event.GetHeight() == 0) {
+        LOG_TRACE(log_tag::Window, "Minimized");
         m_Minimized = true;
         return false;
     }
@@ -88,7 +93,9 @@ void Application::Run() {
         m_ImGuiLayer->Begin();
         {
             PRISM_PROFILE_SCOPE("LayerStack OnImGuiRender");
-            for (Layer* layer : m_LayerStack) { layer->OnImGuiRender(); }
+            for (Layer* layer : m_LayerStack) { 
+                layer->OnImGuiRender();
+            }
         }
         m_ImGuiLayer->End();
 #endif

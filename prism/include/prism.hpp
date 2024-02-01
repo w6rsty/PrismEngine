@@ -13,8 +13,7 @@
 #include "core/event/mouse_event.hpp"
 #include "core/event/application_event.hpp"
 #include "core/window/keycodes.hpp"
-
-#include "platform/Windows/windows_input.hpp"
+#include "core/window/input.hpp"
 
 #include "renderer/orthographic_camera_controller.hpp"
 #include "renderer/renderer.hpp"

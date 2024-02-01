@@ -20,9 +20,11 @@ public:
     void PushLayer(Layer* layer);
     void PushOverlay(Layer* overlay);
 
-    inline static Application& Instance() { return *s_Instance; }
+    ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
     inline Window& GetWindow() { return *m_Window; }
     inline void SetWindowState(bool state) { m_Running = state; }
+    inline static Application& Instance() { return *s_Instance; }
 private:
     bool OnWindowClose(WindowCloseEvent& event);
     bool OnWindowResize(WindowResizeEvent& event);
