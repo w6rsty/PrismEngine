@@ -25,7 +25,5 @@ private:
 
     prism::OrthographicCameraController m_CameraController;
 
-    ParticleSystem m_ParticleSystem { 2000 };
-    ParticleProps m_Particle;
-    uint32_t m_ParticleCount = 0;
+    prism::Ref<prism::Scene> m_ActiveScene;
 };

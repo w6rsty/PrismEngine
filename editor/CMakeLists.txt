@@ -1,7 +1,7 @@
 aux_source_directory(src/ EDITOR_SRC)
 
 add_executable(editor ${EDITOR_SRC})
-target_link_libraries(editor PRIVATE Prism Prism::Core)
+target_link_libraries(editor PRIVATE Prism Prism::Core entt)
 target_include_directories(editor PRIVATE src/)
 
 target_compile_features(editor PRIVATE cxx_std_17)

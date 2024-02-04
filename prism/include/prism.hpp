@@ -27,6 +27,9 @@
 #include "renderer/subtexture2d.hpp"
 #include "renderer/frame_buffer.hpp"
 
+#include "scene/scene.hpp"
+#include "scene/components.hpp"
+
 #include "debug/instrumentor.hpp"
 
 #define PRISM_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

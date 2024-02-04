@@ -1,8 +1,9 @@
 #include "editor_layer.hpp"
 
-#include "core/application.hpp"
+
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
+#include "scene/components.hpp"
 
 namespace prism {
 
@@ -19,6 +20,17 @@ void EditorLayer::OnAttach() {
     fbSpec.width = 1280;
     fbSpec.height = 720;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
+
+    m_ActiveScene = CreateRef<Scene>();
+
+    auto& reg = m_ActiveScene->Reg();
+    const auto red = reg.create();
+    reg.emplace<TransformComponent>(red, glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
+    reg.emplace<SpriteRenderComponent>(red, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+    const auto green = reg.create();
+    reg.emplace<TransformComponent>(green, glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.0f)));
+    reg.emplace<SpriteRenderComponent>(green, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 }
 
 void EditorLayer::OnDetach() {
@@ -40,6 +52,8 @@ void EditorLayer::OnUpdate(Timestep ts) {
         m_CameraController.OnUpdate(ts);
     }
 
+    m_ActiveScene->OnUpdate(ts);
+
     Renderer2D::ReSetStats();
 
     {
@@ -53,7 +67,9 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
         Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-        Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_CheckerboardTexture);
+        Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 1.0f, 1.0f }, m_CheckerboardTexture);
+
+        m_ActiveScene->OnRender();
 
         Renderer2D::EndScene();
         m_FrameBuffer->Unbind();

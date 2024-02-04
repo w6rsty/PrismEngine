@@ -415,6 +415,37 @@ void Renderer2D::DrawTexture(const glm::vec2& position, const Ref<Texture>& text
     DrawTexture({ position.x, position.y, 0.0f }, texture, scale, tiling, tintColor);
 }
 
+void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color) {
+    PRISM_PROFILE_FUNCTION();
+
+    if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
+        FlushAndReset();
+    }
+    
+    constexpr size_t quadVertexCount = 4;
+    constexpr float textureIndex = 0.0f;
+    constexpr glm::vec2 texCoord[] = {
+        { 0.0f, 0.0f },
+        { 1.0f, 0.0f },
+        { 1.0f, 1.0f },
+        { 0.0f, 1.0f }
+    };
+    float tilingFactor = 1.0f;
+
+    for (size_t i = 0; i < quadVertexCount; i++) {
+        s_Data.quadVertexBufferPtr->position = transform * s_Data.quadVertexPositions[i];
+        s_Data.quadVertexBufferPtr->color = color;
+        s_Data.quadVertexBufferPtr->texCoord = texCoord[i];
+        s_Data.quadVertexBufferPtr->texIndex = textureIndex;
+        s_Data.quadVertexBufferPtr->tilingFactor = tilingFactor;
+        s_Data.quadVertexBufferPtr++;
+    }
+    s_Data.quadIndexCount += 6;
+
+    s_Data.stats.quadCount++;
+}
+
+
 Renderer2D::Statistics Renderer2D::GetStats() {
     return s_Data.stats;
 }
