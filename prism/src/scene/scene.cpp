@@ -2,6 +2,7 @@
 
 #include "renderer/renderer2d.hpp"
 #include "scene/components.hpp"
+#include "scene/entity.hpp"
 
 #include "glm/glm.hpp"
 
@@ -28,4 +29,9 @@ void Scene::OnRender() {
     }
 }
 
+Entity Scene::CreateEntity() {
+    Entity entity =  { m_Registry.create(), this };
+    entity.AddComponent<TransformComponent>(glm::mat4(1.0f));
+    return entity;
+}
 } // namespace prism

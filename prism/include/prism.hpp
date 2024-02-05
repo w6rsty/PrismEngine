@@ -29,6 +29,7 @@
 
 #include "scene/scene.hpp"
 #include "scene/components.hpp"
+#include "scene/entity.hpp"
 
 #include "debug/instrumentor.hpp"
 

@@ -6,6 +6,8 @@
 
 namespace prism {
 
+class Entity;
+
 class Scene {
 public:
     Scene();
@@ -14,7 +16,9 @@ public:
     void OnUpdate(Timestep ts);
     void OnRender();
 
-    entt::registry& Reg() { return m_Registry; }
+    Entity CreateEntity();
+
+    friend class Entity;
 private:
     entt::registry m_Registry;
 };

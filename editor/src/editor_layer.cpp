@@ -1,10 +1,12 @@
 #include "editor_layer.hpp"
 
+#include "scene/components.hpp"
+
 
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
-#include "scene/components.hpp"
 
+#include <string>
 namespace prism {
 
 EditorLayer::EditorLayer()
@@ -23,14 +25,8 @@ void EditorLayer::OnAttach() {
 
     m_ActiveScene = CreateRef<Scene>();
 
-    auto& reg = m_ActiveScene->Reg();
-    const auto red = reg.create();
-    reg.emplace<TransformComponent>(red, glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
-    reg.emplace<SpriteRenderComponent>(red, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-    const auto green = reg.create();
-    reg.emplace<TransformComponent>(green, glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.0f)));
-    reg.emplace<SpriteRenderComponent>(green, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    m_SquareEntity = m_ActiveScene->CreateEntity();
+    m_SquareEntity.AddComponent<SpriteRenderComponent>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 }
 
 void EditorLayer::OnDetach() {
@@ -140,6 +136,11 @@ void EditorLayer::OnImGuiRender() {
     ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
+    ImGui::Separator();
+
+    auto&  color = m_SquareEntity.GetComponent<SpriteRenderComponent>();
+    ImGui::ColorEdit4("Square Color", glm::value_ptr(color.Color));
+
     ImGui::End();
     
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -150,8 +151,6 @@ void EditorLayer::OnImGuiRender() {
     Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-
-
 
     if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize && viewportPanelSize.x > 0 && viewportPanelSize.y > 0) {
         // m_FrameBuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
