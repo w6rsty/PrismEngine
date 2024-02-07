@@ -109,6 +109,20 @@ void Renderer2D::Shutdown() {
 
 }
 
+void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform) {
+    PRISM_PROFILE_FUNCTION();
+
+    glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
+
+    s_Data.shader->Bind();
+    s_Data.shader->SetMat4("u_ViewProjection", viewProj);
+
+    s_Data.quadIndexCount = 0;
+    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
+
+    s_Data.textureSlotIndex = 1;
+}
+
 void Renderer2D::BeginScene(const OrthographicCamera& camera) {
     PRISM_PROFILE_FUNCTION();
 

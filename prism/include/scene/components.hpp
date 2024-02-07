@@ -1,9 +1,20 @@
 #pragma once
 
+#include "renderer/camera.hpp"
+#include "scene/scene_camera.hpp"
+
 #include "glm/glm.hpp"
+
+#include <string>
 
 namespace prism {
 
+struct TagComponent {
+    std::string name;
+
+    TagComponent(const std::string& name)
+    : name(name) {}
+};
 struct TransformComponent {
     glm::mat4 Transform;
 
@@ -25,6 +36,15 @@ struct SpriteRenderComponent {
     SpriteRenderComponent(const glm::vec4& color)
         : Color(color) {
     }
+};
+
+struct CameraComponent {
+    SceneCamera camera;
+    bool primary = true;
+    bool fixedAspectRatio = false;
+
+    CameraComponent() {}
+    CameraComponent(const CameraComponent&) = default; 
 };
 
 } // namespace prism

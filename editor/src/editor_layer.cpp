@@ -25,8 +25,11 @@ void EditorLayer::OnAttach() {
 
     m_ActiveScene = CreateRef<Scene>();
 
-    m_SquareEntity = m_ActiveScene->CreateEntity();
+    m_SquareEntity = m_ActiveScene->CreateEntity("Square entity");
     m_SquareEntity.AddComponent<SpriteRenderComponent>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+
+    m_CameraEntity = m_ActiveScene->CreateEntity("Camera entity");
+    m_CameraEntity.AddComponent<CameraComponent>();
 }
 
 void EditorLayer::OnDetach() {
@@ -53,23 +56,13 @@ void EditorLayer::OnUpdate(Timestep ts) {
     Renderer2D::ReSetStats();
 
     {
-        PRISM_PROFILE_SCOPE("Renderer Prep");
         m_FrameBuffer->Bind();
         RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
         RenderCommand::Clear();
-    }
-    {
-        PRISM_PROFILE_SCOPE("Renderer Draw");
-
-        Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-        Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 1.0f, 1.0f }, m_CheckerboardTexture);
 
         m_ActiveScene->OnRender();
 
-        Renderer2D::EndScene();
         m_FrameBuffer->Unbind();
-        RenderCommand::Clear();
     }
 }
 
@@ -123,7 +116,6 @@ void EditorLayer::OnImGuiRender() {
             if (ImGui::MenuItem("Exit")) Application::Instance().Close();
             ImGui::EndMenu();
         }
-
         ImGui::EndMenuBar();
     }
 
@@ -141,6 +133,18 @@ void EditorLayer::OnImGuiRender() {
     auto&  color = m_SquareEntity.GetComponent<SpriteRenderComponent>();
     ImGui::ColorEdit4("Square Color", glm::value_ptr(color.Color));
 
+    ImGui::Separator();
+
+    ImGui::SliderFloat3("Transform3", glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Transform[3]), -10.0f, 10.0f);
+
+    {
+        auto& camera = m_CameraEntity.GetComponent<CameraComponent>().camera;
+        float orthoSize = camera.GetOrthoGraphicSize();
+        if (ImGui::SliderFloat("Ortho Size", &orthoSize, 0.0f, 10.0f)) {
+            camera.SetOrthoGraphicSize(orthoSize);
+        }
+    }
+
     ImGui::End();
     
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -156,6 +160,7 @@ void EditorLayer::OnImGuiRender() {
         // m_FrameBuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
         m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
 
     uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();

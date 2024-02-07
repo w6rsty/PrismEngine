@@ -26,7 +26,7 @@ private:
     Ref<Texture> m_CheckerboardTexture;
 
     Ref<Scene> m_ActiveScene;
-    Entity m_SquareEntity;
+    Entity m_SquareEntity, m_CameraEntity;
 };
 
 } // namespace prism
