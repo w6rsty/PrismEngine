@@ -19,10 +19,9 @@ public:
     }
 
     template <typename T, typename... Args>
-    Entity& AddComponent(Args&&... args) {
+    T& AddComponent(Args&&... args) {
         PRISM_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-        m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
-        return *this;
+        return m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
     }
 
     template <typename T>

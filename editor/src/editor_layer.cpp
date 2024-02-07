@@ -28,8 +28,36 @@ void EditorLayer::OnAttach() {
     m_SquareEntity = m_ActiveScene->CreateEntity("Square entity");
     m_SquareEntity.AddComponent<SpriteRenderComponent>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 
+    class Player : public ScriptableEntity {
+    public:
+        void OnCreate() {
+            std::cout << "Instantiating Player Script" << std::endl;
+        }
+
+        void OnDestroy() {
+
+        }
+
+        void OnUpdate(Timestep ts) {
+            auto& transform = GetComponent<TransformComponent>().Transform;
+            float speed = 5.0f;
+
+            if (Input::IsKeyPressed(PRISM_KEY_A)) {
+                transform[3][0] -= speed * ts;
+            } else if (Input::IsKeyPressed(PRISM_KEY_D)) {
+                transform[3][0] += speed * ts;
+            }
+            if (Input::IsKeyPressed(PRISM_KEY_W)) {
+                transform[3][1] += speed * ts;
+            } else if (Input::IsKeyPressed(PRISM_KEY_S)) {
+                transform[3][1] -= speed * ts;
+            }
+        }
+    };
     m_CameraEntity = m_ActiveScene->CreateEntity("Camera entity");
     m_CameraEntity.AddComponent<CameraComponent>();
+    m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<Player>();
+
 }
 
 void EditorLayer::OnDetach() {
@@ -45,6 +73,14 @@ void EditorLayer::OnUpdate(Timestep ts) {
         m_FPS = m_FrameCount / m_Time;
         m_FrameCount = 0;
         m_Time = 0.0f;
+    }
+
+    if (const auto& spec = m_FrameBuffer->GetSpecification(); 
+        m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+        (spec.width != m_ViewportSize.x || spec.height != m_ViewportSize.y)) {
+        m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
 
     if (m_ViewportFocused) {
@@ -155,13 +191,7 @@ void EditorLayer::OnImGuiRender() {
     Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-
-    if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize && viewportPanelSize.x > 0 && viewportPanelSize.y > 0) {
-        // m_FrameBuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
-        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-        m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
-        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-    }
+    m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
     uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
     ImGui::Image((void*)textureID, { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
