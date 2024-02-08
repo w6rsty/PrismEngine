@@ -23,8 +23,7 @@ struct TransformComponent {
     TransformComponent() = default;
     TransformComponent(const TransformComponent&) = default;
     TransformComponent(const glm::mat4& transform)
-        : Transform(transform) {
-    }
+    : Transform(transform) {}
 
     operator glm::mat4&() { return Transform; }
     operator const glm::mat4&() const { return Transform; }
@@ -36,8 +35,7 @@ struct SpriteRenderComponent {
     SpriteRenderComponent() = default;
     SpriteRenderComponent(const SpriteRenderComponent&) = default;
     SpriteRenderComponent(const glm::vec4& color)
-        : Color(color) {
-    }
+    : Color(color) {}
 };
 
 struct CameraComponent {
@@ -52,24 +50,13 @@ struct CameraComponent {
 struct NativeScriptComponent {
     ScriptableEntity* Instance = nullptr;
 
-    std::function<void()> InstantiateFunction;
-    std::function<void()> DestroyInstanceFunction;
-
-    std::function<void(ScriptableEntity*)> OnCreateFunction;
-    std::function<void(ScriptableEntity*)> OnDestroyFunction;
-    std::function<void(ScriptableEntity*, Timestep)> OnUpdateFunction;
+    ScriptableEntity*(*InstantiateScript)();
+    void(*DestroyScript)(NativeScriptComponent*);
 
     template <typename T>
     void Bind() {
-        InstantiateFunction = [&]() { Instance = new T(); };
-        DestroyInstanceFunction = [&]() { 
-            delete (T*)Instance;
-            Instance = nullptr;
-        };
-
-        OnCreateFunction = [](ScriptableEntity* instance) { static_cast<T*>(instance)->OnCreate(); };
-        OnDestroyFunction = [](ScriptableEntity* instance) { static_cast<T*>(instance)->OnDestroy(); };
-        OnUpdateFunction = [](ScriptableEntity* instance, Timestep ts) { static_cast<T*>(instance)->OnUpdate(ts); };
+        InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+        DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
     }
 };
 

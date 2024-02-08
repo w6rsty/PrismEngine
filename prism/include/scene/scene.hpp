@@ -14,7 +14,6 @@ public:
     ~Scene();
 
     void OnUpdate(Timestep ts);
-    void OnRender();
 
     Entity CreateEntity(const std::string& name);
 

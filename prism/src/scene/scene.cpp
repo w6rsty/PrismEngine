@@ -21,25 +21,21 @@ void Scene::OnUpdate(Timestep ts) {
     {
         m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
             if (!nsc.Instance) {
-                nsc.InstantiateFunction();
-                nsc.Instance->m_Entity = Entity{ entity, this };\
-                if (nsc.OnCreateFunction)
-                    nsc.OnCreateFunction(nsc.Instance);
+                nsc.Instance = nsc.InstantiateScript();
+                nsc.Instance->m_Entity = Entity{ entity, this };
+                nsc.Instance->OnCreate();
             }
 
-            if (nsc.OnUpdateFunction)
-                nsc.OnUpdateFunction(nsc.Instance, ts);
+            nsc.Instance->OnUpdate(ts);
         });
     }
-}
 
-void Scene::OnRender() {
     Camera* mainCamera = nullptr;
     glm::mat4* camraTransform = nullptr;
     {
         auto view = m_Registry.view<TransformComponent, CameraComponent>();
         for (auto entity : view) {
-            const auto& [transform, camera] = m_Registry.get<TransformComponent, CameraComponent>(entity);
+            const auto [transform, camera] = m_Registry.get<TransformComponent, CameraComponent>(entity);
 
             if (camera.primary) {
                 mainCamera = &camera.camera;
@@ -53,13 +49,14 @@ void Scene::OnRender() {
         auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderComponent>);
 
         for (auto entity : group) {
-            const auto& [transform, sprite] = group.get<TransformComponent, SpriteRenderComponent>(entity);
+            const auto [transform, sprite] = group.get<TransformComponent, SpriteRenderComponent>(entity);
             Renderer2D::DrawQuad(transform, sprite.Color);
         }
 
         Renderer2D::EndScene();
     }
 }
+
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity =  { m_Registry.create(), this };

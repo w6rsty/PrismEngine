@@ -1,7 +1,8 @@
 #include "editor_layer.hpp"
 
+#include "core/core.hpp"
 #include "scene/components.hpp"
-
+#include "scene/scriptable_entity.hpp"
 
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
@@ -19,8 +20,8 @@ void EditorLayer::OnAttach() {
     m_CheckerboardTexture = Texture2D::Create("../../editor/assets/textures/Checkerboard.png");
 	
     FrameBufferSpecification fbSpec;
-    fbSpec.width = 1280;
-    fbSpec.height = 720;
+    fbSpec.width = 160;
+    fbSpec.height = 90;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     m_ActiveScene = CreateRef<Scene>();
@@ -30,15 +31,15 @@ void EditorLayer::OnAttach() {
 
     class Player : public ScriptableEntity {
     public:
-        void OnCreate() {
+        void OnCreate() override {
             std::cout << "Instantiating Player Script" << std::endl;
         }
 
-        void OnDestroy() {
+        void OnDestroy() override{
 
         }
 
-        void OnUpdate(Timestep ts) {
+        void OnUpdate(Timestep ts) override {
             auto& transform = GetComponent<TransformComponent>().Transform;
             float speed = 5.0f;
 
@@ -61,6 +62,7 @@ void EditorLayer::OnAttach() {
 }
 
 void EditorLayer::OnDetach() {
+    PRISM_PROFILE_FUNCTION();
 
 }
 
@@ -87,19 +89,15 @@ void EditorLayer::OnUpdate(Timestep ts) {
         m_CameraController.OnUpdate(ts);
     }
 
-    m_ActiveScene->OnUpdate(ts);
-
     Renderer2D::ReSetStats();
 
-    {
-        m_FrameBuffer->Bind();
-        RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-        RenderCommand::Clear();
+    m_FrameBuffer->Bind();
+    RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+    RenderCommand::Clear();
 
-        m_ActiveScene->OnRender();
+    m_ActiveScene->OnUpdate(ts);
 
-        m_FrameBuffer->Unbind();
-    }
+    m_FrameBuffer->Unbind();
 }
 
 void EditorLayer::OnEvent(Event& event) {
