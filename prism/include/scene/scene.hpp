@@ -7,7 +7,7 @@
 namespace prism {
 
 class Entity;
-
+class SceneHierarchyPanel;
 class Scene {
 public:
     Scene();
@@ -18,11 +18,12 @@ public:
     Entity CreateEntity(const std::string& name);
 
     void OnViewportResize(uint32_t width, uint32_t height);
-
-    friend class Entity;
 private:
     entt::registry m_Registry;
     uint32_t m_ViewportWidth, m_ViewportHeight;
+
+    friend class Entity;
+    friend class SceneHierarchyPanel;
 };
 
 } // namespace prism

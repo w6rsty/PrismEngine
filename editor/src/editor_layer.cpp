@@ -20,8 +20,8 @@ void EditorLayer::OnAttach() {
     m_CheckerboardTexture = Texture2D::Create("../../editor/assets/textures/Checkerboard.png");
 	
     FrameBufferSpecification fbSpec;
-    fbSpec.width = 160;
-    fbSpec.height = 90;
+    fbSpec.width = 16;
+    fbSpec.height = 9;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     m_ActiveScene = CreateRef<Scene>();
@@ -29,10 +29,13 @@ void EditorLayer::OnAttach() {
     m_SquareEntity = m_ActiveScene->CreateEntity("Square entity");
     m_SquareEntity.AddComponent<SpriteRenderComponent>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 
+    m_Square = m_ActiveScene->CreateEntity("Square");
+    m_Square.AddComponent<SpriteRenderComponent>(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
+
     class Player : public ScriptableEntity {
     public:
         void OnCreate() override {
-            std::cout << "Instantiating Player Script" << std::endl;
+
         }
 
         void OnDestroy() override{
@@ -55,10 +58,11 @@ void EditorLayer::OnAttach() {
             }
         }
     };
-    m_CameraEntity = m_ActiveScene->CreateEntity("Camera entity");
+    m_CameraEntity = m_ActiveScene->CreateEntity("Game camera");
     m_CameraEntity.AddComponent<CameraComponent>();
     m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<Player>();
 
+    m_Panel.SetContext(m_ActiveScene);
 }
 
 void EditorLayer::OnDetach() {
@@ -164,25 +168,11 @@ void EditorLayer::OnImGuiRender() {
 
     ImGui::Separator();
 
-    auto&  color = m_SquareEntity.GetComponent<SpriteRenderComponent>();
-    ImGui::ColorEdit4("Square Color", glm::value_ptr(color.Color));
-
-    ImGui::Separator();
-
-    ImGui::SliderFloat3("Transform3", glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Transform[3]), -10.0f, 10.0f);
-
-    {
-        auto& camera = m_CameraEntity.GetComponent<CameraComponent>().camera;
-        float orthoSize = camera.GetOrthoGraphicSize();
-        if (ImGui::SliderFloat("Ortho Size", &orthoSize, 0.0f, 10.0f)) {
-            camera.SetOrthoGraphicSize(orthoSize);
-        }
-    }
-
     ImGui::End();
     
+    ImGuiWindowFlags viewport_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Viewport");
+    ImGui::Begin("Viewport", nullptr, viewport_flags);
 
     m_ViewportFocused = ImGui::IsWindowFocused();
     m_ViewportHovered = ImGui::IsWindowHovered();
@@ -196,6 +186,8 @@ void EditorLayer::OnImGuiRender() {
     
     ImGui::End();
     ImGui::PopStyleVar();
+
+    m_Panel.OnImGuiRender();
 
     ImGui::End();
 }

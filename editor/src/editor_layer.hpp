@@ -1,6 +1,7 @@
 #pragma once
 
 #include "prism.hpp"
+#include "panel/scene_hierarchy_panel.hpp"
 
 namespace prism {
 
@@ -26,7 +27,9 @@ private:
     Ref<Texture> m_CheckerboardTexture;
 
     Ref<Scene> m_ActiveScene;
-    Entity m_SquareEntity, m_CameraEntity;
+    Entity m_SquareEntity, m_CameraEntity, m_Square;
+
+    SceneHierarchyPanel m_Panel;
 };
 
 } // namespace prism

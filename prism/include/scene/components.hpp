@@ -12,10 +12,10 @@
 namespace prism {
 
 struct TagComponent {
-    std::string name;
+    std::string tag;
 
-    TagComponent(const std::string& name)
-    : name(name) {}
+    TagComponent(const std::string& tag)
+    : tag(tag) {}
 };
 struct TransformComponent {
     glm::mat4 Transform;

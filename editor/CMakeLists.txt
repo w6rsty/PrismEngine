@@ -1,4 +1,5 @@
 aux_source_directory(src/ EDITOR_SRC)
+aux_source_directory(src/panel EDITOR_SRC)
 
 add_executable(editor ${EDITOR_SRC})
 target_link_libraries(editor PRIVATE Prism Prism::Core entt)
