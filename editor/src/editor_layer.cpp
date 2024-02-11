@@ -17,51 +17,13 @@ EditorLayer::EditorLayer()
 
 }
 
-void EditorLayer::OnAttach() {
-    m_CheckerboardTexture = Texture2D::Create("../../editor/assets/textures/Checkerboard.png");
-	
+void EditorLayer::OnAttach() {	
     FrameBufferSpecification fbSpec;
     fbSpec.width = 16;
     fbSpec.height = 9;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     m_ActiveScene = CreateRef<Scene>();
-
-    m_SquareEntity = m_ActiveScene->CreateEntity("Square entity");
-    m_SquareEntity.AddComponent<SpriteRenderComponent>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-
-    m_Square = m_ActiveScene->CreateEntity("Square");
-    m_Square.AddComponent<SpriteRenderComponent>(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
-
-    class Player : public ScriptableEntity {
-    public:
-        void OnCreate() override {
-
-        }
-
-        void OnDestroy() override{
-
-        }
-
-        void OnUpdate(Timestep ts) override {
-            auto& translation = GetComponent<TransformComponent>().Translation;
-            float speed = 5.0f;
-
-            if (Input::IsKeyPressed(PRISM_KEY_A)) {
-                translation.x -= speed * ts;
-            } else if (Input::IsKeyPressed(PRISM_KEY_D)) {
-                translation.x += speed * ts;
-            }
-            if (Input::IsKeyPressed(PRISM_KEY_W)) {
-                translation.y += speed * ts;
-            } else if (Input::IsKeyPressed(PRISM_KEY_S)) {
-                translation.y -= speed * ts;
-            }
-        }
-    };
-    m_CameraEntity = m_ActiveScene->CreateEntity("Game camera");
-    m_CameraEntity.AddComponent<CameraComponent>();
-    m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<Player>();
 
     m_Panel.SetContext(m_ActiveScene);
 }
@@ -84,7 +46,8 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     if (const auto& spec = m_FrameBuffer->GetSpecification(); 
         m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
-        (spec.width != m_ViewportSize.x || spec.height != m_ViewportSize.y)) {
+        (spec.width != m_ViewportSize.x || spec.height != m_ViewportSize.y))
+    {
         m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
         m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);

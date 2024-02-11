@@ -45,6 +45,9 @@ public:
 
     static Statistics GetStats();
     static void ReSetStats();
+private:
+    static void StartBatch();
+    static void NextBatch();
 };
 
 } // namespace prism

@@ -65,6 +65,10 @@ Entity Scene::CreateEntity(const std::string& name) {
     return entity;
 }
 
+void Scene::DestroyEntity(Entity entity) {
+    m_Registry.destroy(entity);
+}
+
 void Scene::OnViewportResize(uint32_t width, uint32_t height) {
     m_ViewportWidth = width;
     m_ViewportHeight = height; 
@@ -75,6 +79,38 @@ void Scene::OnViewportResize(uint32_t width, uint32_t height) {
         auto& cameraComponent = view.get<CameraComponent>(entity);
         if (!cameraComponent.fixedAspectRatio) {
             cameraComponent.camera.SetViewportSize(width, height);
+        }
+    }
+}
+
+void Scene::OnComponentAdded(const std::string& name) {
+    // TODO: Optimize this
+    if (std::string(name) == typeid(TransformComponent).name()) {
+        auto view = m_Registry.view<TransformComponent>();
+        for (auto entity : view) {
+            auto& transform = view.get<TransformComponent>(entity);
+        }
+    }
+
+    if (std::string(name) == typeid(SpriteRenderComponent).name()) {
+        auto view = m_Registry.view<SpriteRenderComponent>();
+        for (auto entity : view) {
+            auto& sprite = view.get<SpriteRenderComponent>(entity);
+        }
+    }
+
+    if (std::string(name) == typeid(CameraComponent).name()) {
+        auto view = m_Registry.view<CameraComponent>();
+        for (auto entity : view) {
+            auto& camera = view.get<CameraComponent>(entity);
+            camera.camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+        }
+    }
+
+    if (std::string(name) == typeid(NativeScriptComponent).name()) {
+        auto view = m_Registry.view<NativeScriptComponent>();
+        for (auto entity : view) {
+            auto& nsc = view.get<NativeScriptComponent>(entity);
         }
     }
 }

@@ -117,10 +117,7 @@ void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform) {
     s_Data.shader->Bind();
     s_Data.shader->SetMat4("u_ViewProjection", viewProj);
 
-    s_Data.quadIndexCount = 0;
-    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
-
-    s_Data.textureSlotIndex = 1;
+    StartBatch();
 }
 
 void Renderer2D::BeginScene(const OrthographicCamera& camera) {
@@ -129,17 +126,11 @@ void Renderer2D::BeginScene(const OrthographicCamera& camera) {
     s_Data.shader->Bind();
     s_Data.shader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
-    s_Data.quadIndexCount = 0;
-    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
-
-    s_Data.textureSlotIndex = 1;
+    StartBatch();
 }
 
 void Renderer2D::EndScene() {
     PRISM_PROFILE_FUNCTION();
-
-    uint32_t dataSize = (uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase;
-    s_Data.quadVertexBuffer->SetData(s_Data.quadVertexBufferBase, dataSize);
 
     Flush();
 
@@ -153,23 +144,18 @@ void Renderer2D::Flush() {
         s_Data.textureSlots[i]->Bind(i);
     }
 
+    uint32_t dataSize = (uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase;
+    s_Data.quadVertexBuffer->SetData(s_Data.quadVertexBufferBase, dataSize);
+
     RenderCommand::DrawIndexed(s_Data.quadVertexArray, s_Data.quadIndexCount);
 }
 
-static void FlushAndReset() {
-    Renderer2D::EndScene();
-
-    s_Data.quadIndexCount = 0;
-    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
-
-    s_Data.textureSlotIndex = 1;
-}
 
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
 
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
     
     constexpr size_t quadVertexCount = 4;
@@ -204,7 +190,7 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, cons
     PRISM_PROFILE_FUNCTION();
     
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
     
     constexpr size_t quadVertexCount = 4;
@@ -251,7 +237,7 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, cons
     PRISM_PROFILE_FUNCTION();
     
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
     
     constexpr size_t quadVertexCount = 4;
@@ -295,7 +281,7 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& siz
     PRISM_PROFILE_FUNCTION();
     
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
 
     constexpr size_t quadVertexCount = 4;
@@ -318,7 +304,6 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& siz
         s_Data.quadVertexBufferPtr++;
     }
 
-
     s_Data.quadIndexCount += 6;
 
     s_Data.stats.quadCount++;
@@ -332,7 +317,7 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& siz
     PRISM_PROFILE_FUNCTION();
     
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
 
     constexpr size_t quadVertexCount = 4;
@@ -379,7 +364,7 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& siz
     PRISM_PROFILE_FUNCTION();
     
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
 
     constexpr size_t quadVertexCount = 4;
@@ -433,7 +418,7 @@ void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color) {
     PRISM_PROFILE_FUNCTION();
 
     if (s_Data.quadIndexCount >= Render2DData::maxIndices) {
-        FlushAndReset();
+        NextBatch();
     }
     
     constexpr size_t quadVertexCount = 4;
@@ -466,6 +451,18 @@ Renderer2D::Statistics Renderer2D::GetStats() {
 
 void Renderer2D::ReSetStats() {
     memset(&s_Data.stats, 0, sizeof(Statistics));
+}
+
+void Renderer2D::StartBatch() {
+    s_Data.quadIndexCount = 0;
+    s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
+
+    s_Data.textureSlotIndex = 1;
+}
+
+void Renderer2D::NextBatch() {
+    Flush();
+    StartBatch();
 }
 
 } // namespace prism

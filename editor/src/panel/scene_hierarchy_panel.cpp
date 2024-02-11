@@ -2,6 +2,7 @@
 
 #include "glm/trigonometric.hpp"
 #include "scene/components.hpp"
+#include "scene/scene.hpp"
 #include "scene/scene_camera.hpp"
 
 #include "entt.hpp"
@@ -30,11 +31,37 @@ void SceneHierarchyPanel::OnImGuiRender() {
         m_SelectedContext = {};
     }
 
+    ImGuiPopupFlags flags = ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverExistingPopup;
+    if (ImGui::BeginPopupContextWindow(0, flags)) {
+        if (ImGui::MenuItem("Create empty entity")) {
+            m_Context->CreateEntity("Empty Entity");
+        }
+        ImGui::EndPopup();
+    }
+
     ImGui::End();
 
     ImGui::Begin("Properties");
     if (m_SelectedContext) {
         DrawEntity(m_SelectedContext);
+
+        ImGui::Separator();
+
+        if (ImGui::Button("Add component")) {
+            ImGui::OpenPopup("AddComponent");
+        }
+
+        if (ImGui::BeginPopup("AddComponent")) {
+            if (ImGui::MenuItem("Camera")) {
+                m_SelectedContext.AddComponent<CameraComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+            if (ImGui::MenuItem("Sprite Renderer")) {
+                m_SelectedContext.AddComponent<SpriteRenderComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
     }
     ImGui::End();
 }
@@ -48,8 +75,23 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
         m_SelectedContext = entity;
     }
 
+    bool entityDeleted = false;
+    if (ImGui::BeginPopupContextItem()) {
+        if (ImGui::MenuItem("Delete Entity")) {
+            entityDeleted = true;
+        }
+        ImGui::EndPopup();
+    }
+
     if (opened) {
         ImGui::TreePop();
+    }
+
+    if (entityDeleted) { 
+        m_Context->DestroyEntity(entity);
+        if (m_SelectedContext == entity) {
+            m_SelectedContext = {};
+        }
     }
 }
 
@@ -129,7 +171,7 @@ void SceneHierarchyPanel::DrawEntity(Entity entity) {
         ImGui::Separator();
     }
 
-    DrawComponent<TransformComponent>(entity, "Transform,", [](Entity entity) {
+    DrawComponent<TransformComponent>(entity, "Transform", false, [](Entity entity) {
         auto& tc = entity.GetComponent<TransformComponent>();
         DrawVec3Control("Translation", tc.Translation, 0.0f, 0.1f, -1000.0f, 1000.0f);
         glm::vec3 rotation = glm::degrees(tc.Rotation);
@@ -138,12 +180,12 @@ void SceneHierarchyPanel::DrawEntity(Entity entity) {
         DrawVec3Control("Scale", tc.Scale, 1.0f, 0.1f, 0.0f, 100.0f);
     });
 
-    DrawComponent<SpriteRenderComponent>(entity, "Color", [](Entity entity) {
+    DrawComponent<SpriteRenderComponent>(entity, "Color", true, [](Entity entity) {
         auto& color = entity.GetComponent<SpriteRenderComponent>().Color;
         ImGui::ColorEdit4("Color", glm::value_ptr(color));
     });
 
-    DrawComponent<CameraComponent>(entity, "Camera", [](Entity entity) {
+    DrawComponent<CameraComponent>(entity, "Camera", true, [](Entity entity) {
         auto& cameraComponent = entity.GetComponent<CameraComponent>();
         auto& camera = cameraComponent.camera;
 

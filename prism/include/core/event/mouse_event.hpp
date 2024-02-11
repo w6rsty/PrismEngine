@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/event/event.hpp"
 #include "event.hpp"
 #include <sstream>
 
@@ -21,7 +22,7 @@ public:
     }
 
     EVENT_CLASS_TYPE(MouseMoved)
-    EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+    EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
 };
 
 class MouseScrolledEvent final : public Event {

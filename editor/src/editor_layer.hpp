@@ -24,11 +24,7 @@ private:
     Ref<FrameBuffer> m_FrameBuffer;
     glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
-    Ref<Texture> m_CheckerboardTexture;
-
     Ref<Scene> m_ActiveScene;
-    Entity m_SquareEntity, m_CameraEntity, m_Square;
-
     SceneHierarchyPanel m_Panel;
 };
 

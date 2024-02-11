@@ -5,6 +5,7 @@
 #include "scene/entity.hpp"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "glm/glm.hpp"
 
 namespace prism {
@@ -24,14 +25,30 @@ public:
     using DrawComponentFn = void(*)(Entity);
 
     template <typename T>
-    void DrawComponent(Entity entity, const std::string& name, DrawComponentFn fn) {
+    void DrawComponent(Entity entity, const std::string& name, bool removable, DrawComponentFn fn) {
+        ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap; 
         if (entity.HasComponent<T>()) {
-            if (ImGui::TreeNodeEx(
-                    (void*)typeid(T).hash_code(),
-                    ImGuiTreeNodeFlags_DefaultOpen, 
-                    "%s", name.c_str())) {
+            bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
+            bool removeComponent = false;
+            if (removable) {
+                float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+                ImGui::SameLine(ImGui::GetWindowWidth() - lineHeight - 3.0f);
+                if (ImGui::Button("+", { lineHeight + 3.0f, lineHeight })) {
+                    ImGui::OpenPopup("ComponentSettings");
+                }
+                if (ImGui::BeginPopup("ComponentSettings")) {
+                    if (ImGui::MenuItem("Delete")) {
+                        removeComponent = true;
+                    }
+                    ImGui::EndPopup();
+                }
+            }
+            if (open) {
                 fn(entity);
                 ImGui::TreePop();
+            }
+            if (removeComponent) {
+                entity.RemoveComponent<T>();
             }
         }
     }
