@@ -13,10 +13,10 @@
 namespace prism {
 
 struct TagComponent {
-    std::string tag;
+    std::string Tag;
 
     TagComponent(const std::string& tag)
-    : tag(tag) {}
+    : Tag(tag) {}
 };
 struct TransformComponent {
     glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
@@ -48,9 +48,9 @@ struct SpriteRenderComponent {
 };
 
 struct CameraComponent {
-    SceneCamera camera;
-    bool primary = true;
-    bool fixedAspectRatio = false;
+    SceneCamera Camera;
+    bool Primary = true;
+    bool FixedAspectRatio = false;
 
     CameraComponent() {}
     CameraComponent(const CameraComponent&) = default; 

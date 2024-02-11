@@ -19,8 +19,8 @@ EditorLayer::EditorLayer()
 
 void EditorLayer::OnAttach() {	
     FrameBufferSpecification fbSpec;
-    fbSpec.width = 16;
-    fbSpec.height = 9;
+    fbSpec.width = 1280;
+    fbSpec.height = 720;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     m_ActiveScene = CreateRef<Scene>();
@@ -105,11 +105,17 @@ void EditorLayer::OnImGuiRender() {
 
     // DockSpace
     ImGuiIO& io = ImGui::GetIO();
+    ImGuiStyle& style = ImGui::GetStyle();
+    float minWinSizeX = style.WindowMinSize.x;
+    style.WindowMinSize.x = 500.0f;
+    
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
     {
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
     }
+
+    style.WindowMinSize.x = minWinSizeX;
 
     if (ImGui::BeginMenuBar())
     {

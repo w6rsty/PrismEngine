@@ -37,8 +37,8 @@ void Scene::OnUpdate(Timestep ts) {
         for (auto entity : view) {
             const auto [transform, camera] = m_Registry.get<TransformComponent, CameraComponent>(entity);
 
-            if (camera.primary) {
-                mainCamera = &camera.camera;
+            if (camera.Primary) {
+                mainCamera = &camera.Camera;
                 camraTransform = transform.GetTransform();
                 break;
             }
@@ -77,8 +77,8 @@ void Scene::OnViewportResize(uint32_t width, uint32_t height) {
 
     for (auto entity : view) {
         auto& cameraComponent = view.get<CameraComponent>(entity);
-        if (!cameraComponent.fixedAspectRatio) {
-            cameraComponent.camera.SetViewportSize(width, height);
+        if (!cameraComponent.FixedAspectRatio) {
+            cameraComponent.Camera.SetViewportSize(width, height);
         }
     }
 }
@@ -103,7 +103,7 @@ void Scene::OnComponentAdded(const std::string& name) {
         auto view = m_Registry.view<CameraComponent>();
         for (auto entity : view) {
             auto& camera = view.get<CameraComponent>(entity);
-            camera.camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+            camera.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
         }
     }
 

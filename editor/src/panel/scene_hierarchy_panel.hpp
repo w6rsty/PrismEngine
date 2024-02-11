@@ -22,34 +22,42 @@ public:
     void DrawEntityNode(Entity entity);
     void DrawEntity(Entity entity);
 
-    using DrawComponentFn = void(*)(Entity);
 
-    template <typename T>
-    void DrawComponent(Entity entity, const std::string& name, bool removable, DrawComponentFn fn) {
-        ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap; 
+    template <typename T, typename UIFn>
+    static void DrawComponent(Entity entity, const std::string& name, bool removable, UIFn function) {
+        ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen 
+            | ImGuiTreeNodeFlags_AllowItemOverlap
+            | ImGuiTreeNodeFlags_Framed
+            | ImGuiTreeNodeFlags_SpanAvailWidth
+            | ImGuiTreeNodeFlags_FramePadding; 
         if (entity.HasComponent<T>()) {
-            bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
+            auto& component = entity.GetComponent<T>();
             bool removeComponent = false;
+            ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4));
+            float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+            ImGui::Separator();
+            bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
+            ImGui::PopStyleVar();
+
             if (removable) {
-                float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-                ImGui::SameLine(ImGui::GetWindowWidth() - lineHeight - 3.0f);
-                if (ImGui::Button("+", { lineHeight + 3.0f, lineHeight })) {
+                ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+                if (ImGui::Button("+", ImVec2(lineHeight, lineHeight))) {
                     ImGui::OpenPopup("ComponentSettings");
                 }
+
                 if (ImGui::BeginPopup("ComponentSettings")) {
-                    if (ImGui::MenuItem("Delete")) {
-                        removeComponent = true;
-                    }
+                    if (ImGui::MenuItem("Delete")) { removeComponent = true; }
                     ImGui::EndPopup();
                 }
             }
             if (open) {
-                fn(entity);
+                // Draw the component
+                function(component);
                 ImGui::TreePop();
             }
-            if (removeComponent) {
-                entity.RemoveComponent<T>();
-            }
+            if (removeComponent) { entity.RemoveComponent<T>(); }
         }
     }
 private:
