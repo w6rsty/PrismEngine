@@ -4,10 +4,11 @@
 #include "scene/components.hpp"
 #include "scene/scriptable_entity.hpp"
 
-#include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <string>
+
 namespace prism {
 
 EditorLayer::EditorLayer()
@@ -43,18 +44,18 @@ void EditorLayer::OnAttach() {
         }
 
         void OnUpdate(Timestep ts) override {
-            auto& transform = GetComponent<TransformComponent>().Transform;
+            auto& translation = GetComponent<TransformComponent>().Translation;
             float speed = 5.0f;
 
             if (Input::IsKeyPressed(PRISM_KEY_A)) {
-                transform[3][0] -= speed * ts;
+                translation.x -= speed * ts;
             } else if (Input::IsKeyPressed(PRISM_KEY_D)) {
-                transform[3][0] += speed * ts;
+                translation.x += speed * ts;
             }
             if (Input::IsKeyPressed(PRISM_KEY_W)) {
-                transform[3][1] += speed * ts;
+                translation.y += speed * ts;
             } else if (Input::IsKeyPressed(PRISM_KEY_S)) {
-                transform[3][1] -= speed * ts;
+                translation.y -= speed * ts;
             }
         }
     };
@@ -157,35 +158,35 @@ void EditorLayer::OnImGuiRender() {
         ImGui::EndMenuBar();
     }
 
-    ImGui::Begin("Infos");
+    {
+        ImGui::Begin("Infos");
+        auto stats = Renderer2D::GetStats();
+        ImGui::Text("FPS: %.2f", m_FPS);
+        ImGui::Text("Draw Calls: %d", stats.drawCalls);
+        ImGui::Text("Quads: %d", stats.quadCount);
+        ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+        ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+        ImGui::End();
+    }
 
-    auto stats = Renderer2D::GetStats();
-    ImGui::Text("FPS: %.2f", m_FPS);
-    ImGui::Text("Draw Calls: %d", stats.drawCalls);
-    ImGui::Text("Quads: %d", stats.quadCount);
-    ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-    ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+    {
+        ImGuiWindowFlags viewport_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("Viewport", nullptr, viewport_flags);
 
-    ImGui::Separator();
+        m_ViewportFocused = ImGui::IsWindowFocused();
+        m_ViewportHovered = ImGui::IsWindowHovered();
+        Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
-    ImGui::End();
-    
-    ImGuiWindowFlags viewport_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Viewport", nullptr, viewport_flags);
+        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-    m_ViewportFocused = ImGui::IsWindowFocused();
-    m_ViewportHovered = ImGui::IsWindowHovered();
-    Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
-
-    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-    uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-    ImGui::Image((void*)textureID, { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
-    
-    ImGui::End();
-    ImGui::PopStyleVar();
+        uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
+        ImGui::Image((void*)textureID, { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
+        
+        ImGui::End();
+        ImGui::PopStyleVar();
+    }
 
     m_Panel.OnImGuiRender();
 

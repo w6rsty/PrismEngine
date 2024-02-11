@@ -30,7 +30,7 @@ void WindowsWindow::Init(const WindowProps& props) {
     m_Data.height = props.height;
     m_Data.vSync = true;
 
-    LOG_INFO("EntryPoint", "==> ", props.title, " <==");
+    LOG_INFO("Window", "==> ", props.title, " <==");
     
     {
         PRISM_PROFILE_SCOPE("glfwInit");
