@@ -1,5 +1,6 @@
 #include "imgui/imgui_layer.hpp"
 
+#include "imgui/palette.hpp"
 #include "core/application.hpp"
 
 #include "imgui.h"
@@ -34,6 +35,7 @@ void ImGuiLayer::OnAttach() {
     io.Fonts->AddFontFromFileTTF("../../editor/assets/fonts/NotoSansMono/NotoSansMono-Bold.ttf", 24.0f);
     io.FontDefault = io.Fonts->AddFontFromFileTTF("../../editor/assets/fonts/NotoSansMono/NotoSansMono-Regular.ttf", 24.0f);
 
+    SetStyleShape();
     SetDarkThemeColors();
 
     auto& app = Application::Instance();
@@ -90,41 +92,45 @@ void ImGuiLayer::End() {
 void ImGuiLayer::SetDarkThemeColors() {
     ImGuiStyle& style = ImGui::GetStyle();
     auto& colors = style.Colors;
-    static ImVec4 gruvbox_5_purple= ImVec4{ 0xb1/255.0f, 0x62/255.0f, 0x86/255.0f, 1.0f };
 
-    colors[ImGuiCol_WindowBg] = ImVec4{ 0x1d/255.0f, 0x20/255.0f, 0x21/255.0f, 1.0f };
+    colors[ImGuiCol_WindowBg]           = GruvboxTheme(GruvboxPalette::Bg);
 
-    colors[ImGuiCol_Button] = ImVec4{ 0x42/255.0f, 0x42/255.0f, 0x42/255.0f, 1.0f };
-    colors[ImGuiCol_ButtonHovered] = ImVec4{ 0x42/255.0f, 0x42/255.0f, 0x42/255.0f, 1.0f };
-    colors[ImGuiCol_ButtonActive] = ImVec4{ 0x42/255.0f, 0x42/255.0f, 0x42/255.0f, 1.0f };
+    colors[ImGuiCol_Button]             = GruvboxTheme(GruvboxPalette::Fg4);
+    colors[ImGuiCol_ButtonHovered]      = GruvboxTheme(GruvboxPalette::Fg3);
+    colors[ImGuiCol_ButtonActive]       = GruvboxTheme(GruvboxPalette::Fg4);
 
-    colors[ImGuiCol_Header] = ImVec4{ 0x83/255.0f, 0xa5/255.0f, 0x98/255.0f, 1.0f };
-    colors[ImGuiCol_HeaderHovered] = ImVec4{ 0x2f/255.0f, 0xa5/255.0f, 0x77/255.0f, 1.0f };
-    colors[ImGuiCol_HeaderActive] = ImVec4{ 0x83/255.0f, 0xa5/255.0f, 0x98/255.0f, 1.0f };
+    colors[ImGuiCol_Header]             = GruvboxTheme(GruvboxPalette::Fg4);
+    colors[ImGuiCol_HeaderHovered]      = GruvboxTheme(GruvboxPalette::Fg3);
+    colors[ImGuiCol_HeaderActive]       = GruvboxTheme(GruvboxPalette::Fg4);
 
-    colors[ImGuiCol_Tab] = ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
-    colors[ImGuiCol_TabHovered] = ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f }    ;
-    colors[ImGuiCol_TabActive] = ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
-    colors[ImGuiCol_TabUnfocused] = ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
-    colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
+    colors[ImGuiCol_Tab]                = GruvboxTheme(GruvboxPalette::Bg3);
+    colors[ImGuiCol_TabHovered]         = GruvboxTheme(GruvboxPalette::Bg3);
+    colors[ImGuiCol_TabActive]          = GruvboxTheme(GruvboxPalette::Bg3);
+    colors[ImGuiCol_TabUnfocused]       = GruvboxTheme(GruvboxPalette::Bg3);
+    colors[ImGuiCol_TabUnfocusedActive] = GruvboxTheme(GruvboxPalette::Bg3);
 
-    colors[ImGuiCol_TitleBg] = ImVec4{ 0x83/255.0f, 0xa5/255.0f, 0x98/255.0f, 1.0f };
-    colors[ImGuiCol_TitleBgActive] = ImVec4{ 0x2f/255.0f, 0xa5/255.0f, 0x77/255.0f, 1.0f };
-    colors[ImGuiCol_TitleBgCollapsed] = gruvbox_5_purple;
+    colors[ImGuiCol_TitleBg]            = GruvboxTheme(GruvboxPalette::Fg4);
+    colors[ImGuiCol_TitleBgActive]      = GruvboxTheme(GruvboxPalette::Fg3);
+    colors[ImGuiCol_TitleBgCollapsed]   = GruvboxTheme(GruvboxPalette::Fg4);
 
-    colors[ImGuiCol_FrameBg] = ImVec4{ 0x42/255.0f, 0x42/255.0f, 0x42/255.0f, 1.0f };
-    colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0x42/255.0f, 0x42/255.0f, 0x42/255.0f, 1.0f };
-    colors[ImGuiCol_FrameBgActive] = ImVec4{ 0x42/255.0f, 0x42/255.0f, 0x42/255.0f, 1.0f };
+    colors[ImGuiCol_FrameBg]            = GruvboxTheme(GruvboxPalette::Bg1);
+    colors[ImGuiCol_FrameBgHovered]     = GruvboxTheme(GruvboxPalette::Bg1);
+    colors[ImGuiCol_FrameBgActive]      = GruvboxTheme(GruvboxPalette::Bg1);
 
-    colors[ImGuiCol_ResizeGrip] = ImVec4{ 0x45/255.0f, 0x85/255.0f, 0x88/255.0f, 1.0f };
-    colors[ImGuiCol_ResizeGripHovered] = ImVec4{ 0x45/255.0f, 0x85/255.0f, 0x88/255.0f, 1.0f };
-    colors[ImGuiCol_ResizeGripActive] = ImVec4{ 0x45/255.0f, 0x85/255.0f, 0x88/255.0f, 1.0f };
+    colors[ImGuiCol_ResizeGrip]         = GruvboxTheme(GruvboxPalette::Blue);
+    colors[ImGuiCol_ResizeGripHovered]  = GruvboxTheme(GruvboxPalette::Blue);
+    colors[ImGuiCol_ResizeGripActive]   = GruvboxTheme(GruvboxPalette::Blue);
     
-    colors[ImGuiCol_PopupBg] = ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
-    colors[ImGuiCol_CheckMark] = gruvbox_5_purple;
-    colors[ImGuiCol_DockingPreview] = ImVec4{ 0x45/255.0f, 0x85/255.0f, 0x88/255.0f, 1.0f };
-    
-    // shape
+    colors[ImGuiCol_PopupBg]            = GruvboxTheme(GruvboxPalette::Bg1);
+    colors[ImGuiCol_CheckMark]          = GruvboxTheme(GruvboxPalette::Blue);
+    colors[ImGuiCol_DockingPreview]     = GruvboxTheme(GruvboxPalette::Blue);
+
+    colors[ImGuiCol_SliderGrab]         = GruvboxTheme(GruvboxPalette::Blue);
+    colors[ImGuiCol_SliderGrabActive]   = GruvboxTheme(GruvboxPalette::LightBlue);
+}
+
+void ImGuiLayer::SetStyleShape() {
+    ImGuiStyle& style = ImGui::GetStyle();
     style.FrameRounding = 4.0f;
     style.GrabRounding = 4.0f;
     style.TabRounding = 4.0f;

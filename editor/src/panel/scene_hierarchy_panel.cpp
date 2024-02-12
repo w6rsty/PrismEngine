@@ -1,6 +1,7 @@
 #include "panel/scene_hierarchy_panel.hpp"
 
 #include "glm/trigonometric.hpp"
+#include "imgui/palette.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "scene/scene_camera.hpp"

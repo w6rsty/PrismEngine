@@ -33,5 +33,6 @@
 #include "scene/scriptable_entity.hpp"
 
 #include "debug/instrumentor.hpp"
+#include "imgui/palette.hpp"
 
 #define PRISM_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

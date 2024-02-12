@@ -20,6 +20,7 @@ public:
     void BlockEvents(bool block) { m_Blockevents = block; }
     
     void SetDarkThemeColors();
+    void SetStyleShape();
 private:
     bool m_Blockevents = true;
     float m_Time = 0.0f;
