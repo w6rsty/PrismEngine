@@ -26,6 +26,7 @@ private:
 
     Ref<Scene> m_ActiveScene;
     SceneHierarchyPanel m_Panel;
+    Ref<SceneSerializer> m_Serializer;
 };
 
 } // namespace prism

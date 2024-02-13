@@ -31,6 +31,7 @@
 #include "scene/components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scriptable_entity.hpp"
+#include "scene/scene_serializer.hpp"
 
 #include "debug/instrumentor.hpp"
 #include "imgui/palette.hpp"

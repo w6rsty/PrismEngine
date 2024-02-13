@@ -24,6 +24,7 @@ void EditorLayer::OnAttach() {
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     m_ActiveScene = CreateRef<Scene>();
+    m_Serializer = CreateRef<SceneSerializer>(m_ActiveScene);
 
     m_Panel.SetContext(m_ActiveScene);
 }
@@ -135,6 +136,14 @@ void EditorLayer::OnImGuiRender() {
         ImGui::Text("Quads: %d", stats.quadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+        if (ImGui::Button("Serialize")) {
+            m_Serializer->Serialize("test.toml");
+        }
+        if (ImGui::Button("Deserialize")) {
+            m_Serializer->Deserialize("test.toml");
+        }
+
         ImGui::End();
     }
 

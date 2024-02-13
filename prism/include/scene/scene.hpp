@@ -8,6 +8,8 @@ namespace prism {
 
 class Entity;
 class SceneHierarchyPanel;
+class SceneSerializer;
+
 class Scene {
 public:
     Scene();
@@ -27,6 +29,7 @@ private:
 
     friend class Entity;
     friend class SceneHierarchyPanel;
+    friend class SceneSerializer;
 };
 
 } // namespace prism
