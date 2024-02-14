@@ -6,6 +6,8 @@ namespace prism {
 
 enum class GruvboxPalette {
     Bg = 0,
+    Bg0_h,
+    Bg0_s,
     Bg0,
     Bg1,
     Bg2,
@@ -38,6 +40,8 @@ enum class GruvboxPalette {
 static ImVec4 GruvboxTheme(GruvboxPalette color) {
     switch (color) {
         case GruvboxPalette::Bg:            return ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
+        case GruvboxPalette::Bg0_h:         return ImVec4{ 0x1d/255.0f, 0x20/255.0f, 0x21/255.0f, 1.0f };
+        case GruvboxPalette::Bg0_s:         return ImVec4{ 0x32/255.0f, 0x30/255.0f, 0x2f/255.0f, 1.0f };
         case GruvboxPalette::Bg0:           return ImVec4{ 0x28/255.0f, 0x28/255.0f, 0x28/255.0f, 1.0f };
         case GruvboxPalette::Bg1:           return ImVec4{ 0x3c/255.0f, 0x38/255.0f, 0x36/255.0f, 1.0f };
         case GruvboxPalette::Bg2:           return ImVec4{ 0x50/255.0f, 0x49/255.0f, 0x45/255.0f, 1.0f };

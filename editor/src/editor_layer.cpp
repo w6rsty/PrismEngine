@@ -122,13 +122,25 @@ void EditorLayer::OnImGuiRender() {
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("Exit")) Application::Instance().Close();
+            if (ImGui::MenuItem("Exit")) {
+                Application::Instance().Close();
+                if (m_ActiveScene.get() && m_Serializer.get()) {
+                    m_Serializer->Serialize("test.toml");
+                }
+            }
+            if (ImGui::MenuItem("Save")) m_Serializer->Serialize("test.toml");
+            if (ImGui::MenuItem("Open Recent")) m_Serializer->Deserialize("test.toml");
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("View"))
+        {   if (ImGui::MenuItem("Render Info")) m_ShowRenderInfo = !m_ShowRenderInfo;
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMenuBar();
     }
-
-    {
+    if (m_ShowRenderInfo) {
         ImGui::Begin("Infos");
         auto stats = Renderer2D::GetStats();
         ImGui::Text("FPS: %.2f", m_FPS);
@@ -136,14 +148,6 @@ void EditorLayer::OnImGuiRender() {
         ImGui::Text("Quads: %d", stats.quadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
-        if (ImGui::Button("Serialize")) {
-            m_Serializer->Serialize("test.toml");
-        }
-        if (ImGui::Button("Deserialize")) {
-            m_Serializer->Deserialize("test.toml");
-        }
-
         ImGui::End();
     }
 

@@ -94,6 +94,7 @@ void ImGuiLayer::SetDarkThemeColors() {
     auto& colors = style.Colors;
 
     colors[ImGuiCol_WindowBg]           = GruvboxTheme(GruvboxPalette::Bg);
+    colors[ImGuiCol_WindowBg].w        = 0.8f;
 
     colors[ImGuiCol_Button]             = GruvboxTheme(GruvboxPalette::Fg4);
     colors[ImGuiCol_ButtonHovered]      = GruvboxTheme(GruvboxPalette::Fg3);
@@ -114,7 +115,7 @@ void ImGuiLayer::SetDarkThemeColors() {
     colors[ImGuiCol_TitleBgCollapsed]   = GruvboxTheme(GruvboxPalette::Fg4);
 
     colors[ImGuiCol_FrameBg]            = GruvboxTheme(GruvboxPalette::Bg1);
-    colors[ImGuiCol_FrameBgHovered]     = GruvboxTheme(GruvboxPalette::Bg1);
+    colors[ImGuiCol_FrameBgHovered]     = GruvboxTheme(GruvboxPalette::Bg2);
     colors[ImGuiCol_FrameBgActive]      = GruvboxTheme(GruvboxPalette::Bg1);
 
     colors[ImGuiCol_ResizeGrip]         = GruvboxTheme(GruvboxPalette::Blue);

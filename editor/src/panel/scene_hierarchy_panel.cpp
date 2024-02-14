@@ -114,7 +114,7 @@ static void DrawVec3Control(
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
-    ImGui::DragFloat("##X", &value.x, speed, min, max, "%.1f");
+    (ImGui::DragFloat("##X", &value.x, speed, min, max, "%.1f"));
     ImGui::PopItemWidth();
     ImGui::SameLine();
 

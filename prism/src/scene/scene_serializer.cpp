@@ -4,7 +4,6 @@
 #include "scene/components.hpp"
 #include "scene/entity.hpp"
 
-#include "toml++/toml.hpp"
 #include "entt.hpp"
 #include "glm/glm.hpp"
 
@@ -24,59 +23,22 @@ SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
 bool SceneSerializer::Serialize(const std::string& filepath) {
     LOG_INFO("Serializer", "Serializing scene to: ", filepath);
 
-    auto tbl = toml::table {
-        { "Scene", toml::table {
-            { "ViewporSize", toml::table {
-                { "Width", m_Scene->m_ViewportWidth },
-                { "Height", m_Scene->m_ViewportHeight },
-            }},
-            { "Entities", toml::table {} },
-        } },
-    
-    };
+    toml::table tbl;
 
-    auto view = m_Scene->m_Registry.view<TagComponent>();
-    for (auto entity : view) {
-        Entity e = { entity, m_Scene.get() };
-        auto& tag = view.get<TagComponent>(entity);
+    // Scene Info
+    SerializeScene(tbl);
 
-        toml::table entityTable;
-        entityTable.insert_or_assign("Tag", tag.Tag);
-        if (e.HasComponent<TransformComponent>()) {
-            auto& tc = e.GetComponent<TransformComponent>();
-            entityTable.insert_or_assign("Transform", toml::table {
-                { "Translation", toml::array { tc.Translation.x, tc.Translation.y, tc.Translation.z } },
-                { "Rotation", toml::array { tc.Rotation.x, tc.Rotation.y, tc.Rotation.z } },
-                { "Scale", toml::array { tc.Scale.x, tc.Scale.y, tc.Scale.z } },
-            });
-        }
-        if (e.HasComponent<SpriteRenderComponent>()) {
-            auto& spriteRenderer = e.GetComponent<SpriteRenderComponent>();
-            entityTable.insert_or_assign("SpriteRenderer", toml::table {
-                { "Color", toml::array { spriteRenderer.Color.r, spriteRenderer.Color.g, spriteRenderer.Color.b, spriteRenderer.Color.a } },
-            });
-        }
-        if (e.HasComponent<CameraComponent>()) {
-            auto& cameraComponent = e.GetComponent<CameraComponent>();
-            entityTable.insert_or_assign("Camera", toml::table {
-                { "Primary", cameraComponent.Primary },
-                { "FixedAspectRatio", cameraComponent.FixedAspectRatio },
-                { "Camera", toml::table {
-                        { "ProjectionType", (int)cameraComponent.Camera.GetProjectionType() },
-                        { "PerspectiveFOV", cameraComponent.Camera.GetPerspectiveVerticalFOV() },
-                        { "PerspectiveNear", cameraComponent.Camera.GetPerspectiveNearClip() },
-                        { "PerspectiveFar", cameraComponent.Camera.GetPerspectiveFarClip() },
-                        { "OrthographicSize", cameraComponent.Camera.GetOrthographicSize() },
-                        { "OrthographicNear", cameraComponent.Camera.GetOrthographicNearClip() },
-                        { "OrthographicFar", cameraComponent.Camera.GetOrthographicFarClip() },
-                    }
-                }
-            });
-        }
+    // Entities
+    toml::array entities;
+    m_Scene->m_Registry.view<entt::entity>().each([&](auto entityID) {
+        Entity entity = { entityID, m_Scene.get() };
 
-        std::string id = std::to_string(uint32_t(entity));
-        tbl["Scene"]["Entities"].as_table()->insert_or_assign(id, entityTable);
-    }
+        if (!entity) return;
+
+        SerializeEntity(entities, entity); 
+    });
+    tbl.insert_or_assign("Entities", entities);
+
 
     std::ofstream outputFile(filepath);
     outputFile << tbl;
@@ -90,23 +52,95 @@ bool SceneSerializer::Deserialize(const std::string& filepath) {
 
     std::ifstream input(filepath);
 
-    toml::parse_result res = toml::parse(input);    
-
-    if (!res) {
-        LOG_ERROR("Serializer", "Failed to parse scene file");
+    toml::parse_result result;
+    try {
+        result = toml::parse(input);
+    } catch (const toml::parse_error& err) {
+        LOG_ERROR("Serializer", "Failed to parse scene file: ", err.description());
         return false;
     }
 
-    m_Scene->m_Registry.clear();
-    auto entities = res["Scene"]["Entities"].as_table();
-    for (auto& [id, entity] : *entities) {
-        toml::table& entityTable = *entity.as_table();
-        std::string tag = entityTable["Tag"].as_string()->get();
+    toml::table tbl = result.table();
 
+    DeserializeScene(tbl);
+
+    auto& entities = *tbl["Entities"].as_array();
+    DeserializeEntity(entities);
+
+    return true;
+}
+
+
+void SceneSerializer::SerializeScene(toml::table& sceneTable) {
+    sceneTable.insert_or_assign("Scene", "Untitled Scene");
+    sceneTable.insert_or_assign("ViewportSize", toml::table {
+        { "Width", m_Scene->m_ViewportWidth },
+        { "Height", m_Scene->m_ViewportHeight },
+    });
+}
+
+void SceneSerializer::DeserializeScene(const toml::table& sceneTable) {
+    auto viewportSize = sceneTable["ViewportSize"].as_table();
+    m_Scene->m_ViewportWidth = viewportSize->get("Width")->as_integer()->get();
+    m_Scene->m_ViewportHeight = viewportSize->get("Height")->as_integer()->get();
+}
+
+void SceneSerializer::SerializeEntity(toml::array& array, Entity entity) {
+    toml::table entityTable;
+
+    auto& tag = entity.GetComponent<TagComponent>().Tag;
+    entityTable.insert_or_assign("Tag", tag);
+
+    if (entity.HasComponent<TransformComponent>()) {
+        auto& tc = entity.GetComponent<TransformComponent>();
+
+        entityTable.insert_or_assign("Transform", toml::table {
+            { "Translation",    toml::array { tc.Translation.x, tc.Translation.y,   tc.Translation.z } },
+            { "Rotation",       toml::array { tc.Rotation.x,    tc.Rotation.y,      tc.Rotation.z } },
+            { "Scale",          toml::array { tc.Scale.x,       tc.Scale.y,         tc.Scale.z } },
+        });
+    }
+
+    if (entity.HasComponent<SpriteRenderComponent>()) {
+        auto& src = entity.GetComponent<SpriteRenderComponent>();
+
+        entityTable.insert_or_assign("SpriteRender", toml::table {
+            { "Color",          toml::array { src.Color.r, src.Color.g, src.Color.b, src.Color.a } },
+        });
+    }
+
+    if (entity.HasComponent<CameraComponent>()) {
+        auto& cc = entity.GetComponent<CameraComponent>();
+
+        entityTable.insert_or_assign("Camera", toml::table {
+            { "Primary", cc.Primary },
+            { "FixedAspectRatio", cc.FixedAspectRatio },
+            { "Camera", toml::table {
+                { "ProjectionType",     (int)cc.Camera.GetProjectionType() },
+                { "PerspectiveFOV",     cc.Camera.GetPerspectiveVerticalFOV() },
+                { "PerspectiveNear",    cc.Camera.GetPerspectiveNearClip() },
+                { "PerspectiveFar",     cc.Camera.GetPerspectiveFarClip() },
+                { "OrthographicSize",   cc.Camera.GetOrthographicSize() },
+                { "OrthographicNear",   cc.Camera.GetOrthographicNearClip() },
+                { "OrthographicFar",    cc.Camera.GetOrthographicFarClip() },
+            }},
+        });
+    }
+
+    array.push_back(entityTable);
+}
+
+void SceneSerializer::DeserializeEntity(const toml::array& array) {
+    m_Scene->m_Registry.clear();
+
+    for (auto& entity : array) {
+        auto& entityTable = *entity.as_table();
+
+        std::string tag = entityTable["Tag"].as_string()->get();
         Entity deserializedEntity = m_Scene->CreateEntity(tag);
 
         if (entityTable.contains("Transform")) {
-            toml::table& transform = *entityTable["Transform"].as_table();
+            auto& transform = *entityTable["Transform"].as_table();
             auto translation = transform["Translation"].as_array();
             auto rotation = transform["Rotation"].as_array();
             auto scale = transform["Scale"].as_array();
@@ -129,9 +163,9 @@ bool SceneSerializer::Deserialize(const std::string& filepath) {
             };
         }
 
-        if (entityTable.contains("SpriteRenderer")) {
-            toml::table& spriteRenderer = *entityTable["SpriteRenderer"].as_table();
-            auto color = spriteRenderer["Color"].as_array();
+        if (entityTable.contains("SpriteRender")) {
+            auto& sc = *entityTable["SpriteRender"].as_table();
+            auto color = sc["Color"].as_array();
 
             auto& src = deserializedEntity.AddComponent<SpriteRenderComponent>();
             src.Color = {
@@ -142,9 +176,8 @@ bool SceneSerializer::Deserialize(const std::string& filepath) {
             };
         }
 
-
         if (entityTable.contains("Camera")) {
-            toml::table& camera = *entityTable["Camera"].as_table();
+            auto& camera = *entityTable["Camera"].as_table();
             auto& cc = deserializedEntity.AddComponent<CameraComponent>();
             cc.Primary = camera["Primary"].as_boolean()->get();
             cc.FixedAspectRatio = camera["FixedAspectRatio"].as_boolean()->get();
@@ -158,10 +191,7 @@ bool SceneSerializer::Deserialize(const std::string& filepath) {
             cc.Camera.SetOrthographicNearClip(cameraProps["OrthographicNear"].as_floating_point()->get());
             cc.Camera.SetOrthographicFarClip(cameraProps["OrthographicFar"].as_floating_point()->get());
         }
-
     }
-
-    return true;
 }
 
 } // namespace prism

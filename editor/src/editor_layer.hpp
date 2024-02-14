@@ -19,6 +19,8 @@ private:
     int32_t m_FrameCount = 0;
     float m_FPS = 0.0f;
 
+    bool m_ShowRenderInfo = false;
+
     OrthographicCameraController m_CameraController;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     Ref<FrameBuffer> m_FrameBuffer;
