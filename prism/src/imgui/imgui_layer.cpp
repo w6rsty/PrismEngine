@@ -32,8 +32,10 @@ void ImGuiLayer::OnAttach() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    io.Fonts->AddFontFromFileTTF("../../editor/assets/fonts/NotoSansMono/NotoSansMono-Bold.ttf", 24.0f);
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("../../editor/assets/fonts/NotoSansMono/NotoSansMono-Regular.ttf", 24.0f);
+    io.IniFilename = "editor/imgui.ini";
+
+    io.Fonts->AddFontFromFileTTF("editor/assets/fonts/NotoSansMono/NotoSansMono-Bold.ttf", 24.0f);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("editor/assets/fonts/NotoSansMono/NotoSansMono-Regular.ttf", 24.0f);
 
     SetStyleShape();
     SetDarkThemeColors();

@@ -27,8 +27,8 @@ private:
     glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
     Ref<Scene> m_ActiveScene;
+    std::string m_SceneFilePath;
     SceneHierarchyPanel m_Panel;
-    Ref<SceneSerializer> m_Serializer;
 };
 
 } // namespace prism

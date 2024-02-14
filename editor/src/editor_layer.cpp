@@ -2,10 +2,12 @@
 
 #include "core/core.hpp"
 #include "scene/components.hpp"
+#include "scene/scene_serializer.hpp"
 #include "scene/scriptable_entity.hpp"
 
 #include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "utils/platform_utils.hpp"
 
 #include <string>
 
@@ -24,7 +26,6 @@ void EditorLayer::OnAttach() {
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     m_ActiveScene = CreateRef<Scene>();
-    m_Serializer = CreateRef<SceneSerializer>(m_ActiveScene);
 
     m_Panel.SetContext(m_ActiveScene);
 }
@@ -122,14 +123,27 @@ void EditorLayer::OnImGuiRender() {
     {
         if (ImGui::BeginMenu("File"))
         {
+            if (ImGui::MenuItem("New")) {
+                
+            }
+            if (ImGui::MenuItem("Open")) {
+                SceneSerializer serializer(m_ActiveScene);
+                std::string filepath = FileDialog::OpenFile("Prism Scene (*.toml)\0*.toml\0");
+                serializer.Deserialize(filepath);
+                m_SceneFilePath = filepath;
+            }
+            if (ImGui::MenuItem("Save", 0, false, !m_SceneFilePath.empty())) {
+                SceneSerializer serializer(m_ActiveScene);
+                serializer.Serialize(m_SceneFilePath);
+            }
+            if (ImGui::MenuItem("Save As", 0, false, !m_SceneFilePath.empty())) {
+                SceneSerializer serializer(m_ActiveScene);
+                std::string filepath = FileDialog::SaveFile("Prism Scene (*.toml)\0*.toml\0");
+                serializer.Serialize(filepath);
+            }
             if (ImGui::MenuItem("Exit")) {
                 Application::Instance().Close();
-                if (m_ActiveScene.get() && m_Serializer.get()) {
-                    m_Serializer->Serialize("test.toml");
-                }
             }
-            if (ImGui::MenuItem("Save")) m_Serializer->Serialize("test.toml");
-            if (ImGui::MenuItem("Open Recent")) m_Serializer->Deserialize("test.toml");
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View"))

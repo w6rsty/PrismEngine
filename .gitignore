@@ -1,12 +1,8 @@
 .*
-build
-imgui.ini
-
 .DS_Store
-compile_commands.json
 
-assets/fonts/*
-!assets/fonts/JetBrainsMonoNerdFontMono-SemiBold.ttf
+build
+release
+
 !.gitignore
 !.gitattributes
-editor/assets/textures/body.png

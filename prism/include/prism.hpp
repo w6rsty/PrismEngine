@@ -33,6 +33,8 @@
 #include "scene/scriptable_entity.hpp"
 #include "scene/scene_serializer.hpp"
 
+#include "utils/platform_utils.hpp"
+
 #include "debug/instrumentor.hpp"
 #include "imgui/palette.hpp"
 

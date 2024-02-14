@@ -11,7 +11,6 @@ add_subdirectory(sandbox)
 add_subdirectory(editor)
 
 option(PRISM_BUILD_UNIT_TEST "Build unit test" ON)
-set(PRISM_BUILD_UNIT_TEST ON)
 if (PRISM_BUILD_UNIT_TEST)
     include(CTest)
     enable_testing()
