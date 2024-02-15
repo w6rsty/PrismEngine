@@ -1,13 +1,9 @@
 #include "editor_layer.hpp"
 
-#include "core/core.hpp"
-#include "scene/components.hpp"
-#include "scene/scene_serializer.hpp"
-#include "scene/scriptable_entity.hpp"
+#include "panel/welcome_panel.hpp"
 
 #include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "utils/platform_utils.hpp"
 
 #include <string>
 
@@ -19,15 +15,18 @@ EditorLayer::EditorLayer()
 
 }
 
+void EditorLayer::SetScene(const Ref<Scene>& scene) {
+    m_ActiveScene = scene;
+    m_Panel.SetContext(scene);
+}
+
 void EditorLayer::OnAttach() {	
     FrameBufferSpecification fbSpec;
-    fbSpec.width = 1280;
-    fbSpec.height = 720;
+    fbSpec.width = 1280 / 4;
+    fbSpec.height = 720 / 4;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
-    m_ActiveScene = CreateRef<Scene>();
-
-    m_Panel.SetContext(m_ActiveScene);
+    SetScene(CreateRef<Scene>());
 }
 
 void EditorLayer::OnDetach() {
@@ -50,7 +49,7 @@ void EditorLayer::OnUpdate(Timestep ts) {
         m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
         (spec.width != m_ViewportSize.x || spec.height != m_ViewportSize.y))
     {
-        m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        // m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
         m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
@@ -76,7 +75,7 @@ void EditorLayer::OnEvent(Event& event) {
 
 void EditorLayer::OnImGuiRender() {
     PRISM_PROFILE_FUNCTION();
-
+    
     static bool dockspaceOpen = true;
     static bool opt_fullscreen_persistant = true;
     bool opt_fullscreen = opt_fullscreen_persistant;
@@ -124,15 +123,21 @@ void EditorLayer::OnImGuiRender() {
         if (ImGui::BeginMenu("File"))
         {
             if (ImGui::MenuItem("New")) {
-                
+                SetScene(CreateRef<Scene>());   
+                m_SceneFilePath = "Default";
             }
             if (ImGui::MenuItem("Open")) {
-                SceneSerializer serializer(m_ActiveScene);
+                Ref<Scene> newScene = CreateRef<Scene>();
+                SceneSerializer serializer(newScene);
                 std::string filepath = FileDialog::OpenFile("Prism Scene (*.toml)\0*.toml\0");
-                serializer.Deserialize(filepath);
-                m_SceneFilePath = filepath;
+                if (!filepath.empty()) {
+                    SetScene(newScene);
+
+                    serializer.Deserialize(filepath);
+                    m_SceneFilePath = filepath;
+                }
             }
-            if (ImGui::MenuItem("Save", 0, false, !m_SceneFilePath.empty())) {
+            if (ImGui::MenuItem("Save", 0, false, !m_SceneFilePath.empty() && m_SceneFilePath != "Default")) {
                 SceneSerializer serializer(m_ActiveScene);
                 serializer.Serialize(m_SceneFilePath);
             }
@@ -141,14 +146,19 @@ void EditorLayer::OnImGuiRender() {
                 std::string filepath = FileDialog::SaveFile("Prism Scene (*.toml)\0*.toml\0");
                 serializer.Serialize(filepath);
             }
+            if (ImGui::MenuItem("Close Scene", 0, false, !m_SceneFilePath.empty())) {
+                SetScene(CreateRef<Scene>());
+                m_SceneFilePath.clear();
+            }
             if (ImGui::MenuItem("Exit")) {
                 Application::Instance().Close();
             }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View"))
-        {   if (ImGui::MenuItem("Render Info")) m_ShowRenderInfo = !m_ShowRenderInfo;
-
+        {   
+            if (ImGui::MenuItem("Render Info")) m_ShowRenderInfo = !m_ShowRenderInfo;
+            if (ImGui::MenuItem("Demo")) m_ShowDemo = !m_ShowDemo;
             ImGui::EndMenu();
         }
 
@@ -165,7 +175,11 @@ void EditorLayer::OnImGuiRender() {
         ImGui::End();
     }
 
-    {
+    if (m_ShowDemo) {
+        ImGui::ShowDemoWindow(&m_ShowDemo);
+    }
+
+    if (!m_SceneFilePath.empty()) {
         ImGuiWindowFlags viewport_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport", nullptr, viewport_flags);
@@ -182,9 +196,11 @@ void EditorLayer::OnImGuiRender() {
         
         ImGui::End();
         ImGui::PopStyleVar();
-    }
 
-    m_Panel.OnImGuiRender();
+        m_Panel.OnImGuiRender();
+    } else {
+        DrawWelcomePanel();
+    }
 
     ImGui::End();
 }

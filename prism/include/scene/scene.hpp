@@ -25,6 +25,7 @@ private:
     void OnComponentAdded(const std::string& name);
 private:
     entt::registry m_Registry;
+    std::string m_Name;
     uint32_t m_ViewportWidth, m_ViewportHeight;
 
     friend class Entity;

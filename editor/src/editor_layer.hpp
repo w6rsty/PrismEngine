@@ -15,11 +15,14 @@ public:
     virtual void OnEvent(Event& event) override;
     virtual void OnImGuiRender() override;
 private:
+    void SetScene(const Ref<Scene>& scene);
+private:
     float m_Time = 0.0f;
     int32_t m_FrameCount = 0;
     float m_FPS = 0.0f;
 
     bool m_ShowRenderInfo = false;
+    bool m_ShowDemo = false;
 
     OrthographicCameraController m_CameraController;
     bool m_ViewportFocused = false, m_ViewportHovered = false;

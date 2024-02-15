@@ -72,7 +72,7 @@ bool SceneSerializer::Deserialize(const std::string& filepath) {
 
 
 void SceneSerializer::SerializeScene(toml::table& sceneTable) {
-    sceneTable.insert_or_assign("Scene", "Untitled Scene");
+    sceneTable.insert_or_assign("Scene", m_Scene->m_Name);
     sceneTable.insert_or_assign("ViewportSize", toml::table {
         { "Width", m_Scene->m_ViewportWidth },
         { "Height", m_Scene->m_ViewportHeight },
@@ -81,6 +81,7 @@ void SceneSerializer::SerializeScene(toml::table& sceneTable) {
 
 void SceneSerializer::DeserializeScene(const toml::table& sceneTable) {
     auto viewportSize = sceneTable["ViewportSize"].as_table();
+    m_Scene->m_Name = sceneTable["Scene"].as_string()->get();
     m_Scene->m_ViewportWidth = viewportSize->get("Width")->as_integer()->get();
     m_Scene->m_ViewportHeight = viewportSize->get("Height")->as_integer()->get();
 }
@@ -131,8 +132,6 @@ void SceneSerializer::SerializeEntity(toml::array& array, Entity entity) {
 }
 
 void SceneSerializer::DeserializeEntity(const toml::array& array) {
-    m_Scene->m_Registry.clear();
-
     for (auto& entity : array) {
         auto& entityTable = *entity.as_table();
 

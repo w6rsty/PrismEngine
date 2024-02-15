@@ -24,13 +24,11 @@ if (CMAKE_CXX_FLAGS_DEBUG)
     target_compile_definitions(prism_core PUBLIC ENABLE_ASSERTION)
 endif()
 
-# target_compile_definitions(prism_core PUBLIC PRISM_PROFILE)
-
 target_compile_definitions(prism_core PUBLIC PRISM_IMGUI)
-
 
 add_library(prism STATIC)
 target_sources(prism PRIVATE ${prism_src})
 target_link_libraries(prism PUBLIC prism_core)
+
 add_library(Prism::Core ALIAS prism_core)
 add_library(Prism ALIAS prism)

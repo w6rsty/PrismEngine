@@ -35,6 +35,8 @@ void ImGuiLayer::OnAttach() {
     io.IniFilename = "editor/imgui.ini";
 
     io.Fonts->AddFontFromFileTTF("editor/assets/fonts/NotoSansMono/NotoSansMono-Bold.ttf", 24.0f);
+    // Headline Font
+    io.Fonts->AddFontFromFileTTF("editor/assets/fonts/NotoSansMono/NotoSansMono-Bold.ttf", 50.0f);
     io.FontDefault = io.Fonts->AddFontFromFileTTF("editor/assets/fonts/NotoSansMono/NotoSansMono-Regular.ttf", 24.0f);
 
     SetStyleShape();

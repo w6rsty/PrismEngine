@@ -1,0 +1,91 @@
+Scene = 'Untitled scene'
+
+[ViewportSize]
+Height = 1020
+Width = 1419
+
+[[Entities]]
+Tag = 'Camera Font'
+
+    [Entities.Camera]
+    FixedAspectRatio = false
+    Primary = true
+
+        [Entities.Camera.Camera]
+        OrthographicFar = 1.0
+        OrthographicNear = -1.0
+        OrthographicSize = 10.0
+        PerspectiveFOV = 0.78539818525314331
+        PerspectiveFar = 1000.0
+        PerspectiveNear = 0.0099999997764825821
+        ProjectionType = 0
+
+    [Entities.Transform]
+    Rotation = [ 0.0, 0.0, 0.0 ]
+    Scale = [ 1.0, 1.0, 1.0 ]
+    Translation = [ 0.0, 0.0, 3.5999999046325684 ]
+
+[[Entities]]
+Tag = 'Camera Top'
+
+    [Entities.Camera]
+    FixedAspectRatio = false
+    Primary = false
+
+        [Entities.Camera.Camera]
+        OrthographicFar = 1.0
+        OrthographicNear = -1.0
+        OrthographicSize = 10.0
+        PerspectiveFOV = 0.78539818525314331
+        PerspectiveFar = 1003.9000244140625
+        PerspectiveNear = 0.10000000149011612
+        ProjectionType = 0
+
+    [Entities.Transform]
+    Rotation = [ -1.5707963705062866, 0.0, 0.0 ]
+    Scale = [ 1.0, 1.0, 0.60000002384185791 ]
+    Translation = [ 0.0, 3.5, 0.0 ]
+
+[[Entities]]
+Tag = 'Ground'
+
+    [Entities.SpriteRender]
+    Color = [ 0.51999998092651367, 0.51999998092651367, 0.51999998092651367, 1.0 ]
+
+    [Entities.Transform]
+    Rotation = [ -1.5707963705062866, 0.0, 0.0 ]
+    Scale = [ 2.0, 2.0, 1.0 ]
+    Translation = [ 0.0, -0.5, 0.0 ]
+
+[[Entities]]
+Tag = 'Wall 1'
+
+    [Entities.SpriteRender]
+    Color = [ 0.36923074722290039, 0.0, 0.0, 1.0 ]
+
+    [Entities.Transform]
+    Rotation = [ 0.0, 0.0, 0.0 ]
+    Scale = [ 2.0, 1.0, 1.0 ]
+    Translation = [ 0.0, 0.0, -1.0 ]
+
+[[Entities]]
+Tag = 'Wall 2'
+
+    [Entities.SpriteRender]
+    Color = [ 0.0, 0.52307689189910889, 0.47962126135826111, 1.0 ]
+
+    [Entities.Transform]
+    Rotation = [ 0.0, -1.5707963705062866, 0.0 ]
+    Scale = [ 2.0, 1.0, 1.0 ]
+    Translation = [ 1.0, 0.0, 0.0 ]
+
+[[Entities]]
+Tag = 'Wall 3'
+
+    [Entities.SpriteRender]
+    Color = [ 0.23146028816699982, 0.0, 0.58769232034683228, 1.0 ]
+
+    [Entities.Transform]
+    Rotation = [ 0.0, 1.5707963705062866, 0.0 ]
+    Scale = [ 2.0, 1.0, 1.0 ]
+    Translation = [ -1.0, 0.0, 0.0 ]

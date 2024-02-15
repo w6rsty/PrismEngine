@@ -9,7 +9,8 @@
 namespace prism {
 
 
-Scene::Scene() {
+Scene::Scene()
+: m_Name("Untitled scene") {
     
 }
 

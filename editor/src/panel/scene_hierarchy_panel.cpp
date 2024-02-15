@@ -53,7 +53,6 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     auto& tc = entity.GetComponent<TagComponent>();
 
     ImGuiTreeNodeFlags flags = (entity == m_SelectedContext ? ImGuiTreeNodeFlags_Selected : 0)
-        | ImGuiTreeNodeFlags_OpenOnArrow
         | ImGuiTreeNodeFlags_SpanAvailWidth;
     bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tc.Tag.c_str());
     if (ImGui::IsItemClicked()) {
@@ -114,7 +113,7 @@ static void DrawVec3Control(
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
-    (ImGui::DragFloat("##X", &value.x, speed, min, max, "%.1f"));
+    (ImGui::DragFloat("##X", &value.x, speed, min, max, "%.2f"));
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
@@ -128,7 +127,7 @@ static void DrawVec3Control(
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
-    ImGui::DragFloat("##Y", &value.y, speed, min, max, "%.1f");
+    ImGui::DragFloat("##Y", &value.y, speed, min, max, "%.2f");
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
@@ -142,7 +141,7 @@ static void DrawVec3Control(
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
-    ImGui::DragFloat("##Z", &value.z, speed, min, max, "%.1f");
+    ImGui::DragFloat("##Z", &value.z, speed, min, max, "%.2f");
     ImGui::PopItemWidth();
 
     ImGui:;ImGui::PopStyleVar();
