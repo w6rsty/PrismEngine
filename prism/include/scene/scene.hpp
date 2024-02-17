@@ -21,6 +21,8 @@ public:
     void DestroyEntity(Entity entity);
 
     void OnViewportResize(uint32_t width, uint32_t height);
+
+    Entity GetPrimaryCameraEntity();
 private:
     void OnComponentAdded(const std::string& name);
 private:

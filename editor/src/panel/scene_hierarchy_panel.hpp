@@ -22,6 +22,7 @@ public:
     void DrawEntityNode(Entity entity);
     void DrawEntity(Entity entity);
 
+    Entity GetSelectedEntity() const { return m_SelectedContext; }
 
     template <typename T, typename UIFn>
     static void DrawComponent(Entity entity, const std::string& name, bool removable, UIFn function) {

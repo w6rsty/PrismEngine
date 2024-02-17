@@ -1,5 +1,8 @@
 #include "editor_layer.hpp"
 
+#include "core/logger.hpp"
+#include "core/math/math.hpp"
+#include "core/window/keycodes.hpp"
 #include "panel/welcome_panel.hpp"
 
 #include "imgui.h"
@@ -22,8 +25,8 @@ void EditorLayer::SetScene(const Ref<Scene>& scene) {
 
 void EditorLayer::OnAttach() {	
     FrameBufferSpecification fbSpec;
-    fbSpec.width = 1280 / 4;
-    fbSpec.height = 720 / 4;
+    fbSpec.width = 1920;
+    fbSpec.height = 1080;
     m_FrameBuffer = FrameBuffer::Create(fbSpec);
 
     SetScene(CreateRef<Scene>());
@@ -70,7 +73,12 @@ void EditorLayer::OnUpdate(Timestep ts) {
 }
 
 void EditorLayer::OnEvent(Event& event) {
+    PRISM_PROFILE_FUNCTION();
+
     m_CameraController.OnEvent(event);
+
+    EventDispatcher dispatcher(event);
+    dispatcher.Dispatch<KeyPressedEvent>(PRISM_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 }
 
 void EditorLayer::OnImGuiRender() {
@@ -122,33 +130,20 @@ void EditorLayer::OnImGuiRender() {
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New")) {
-                SetScene(CreateRef<Scene>());   
-                m_SceneFilePath = "Default";
+            if (ImGui::MenuItem("New", "Ctrl+N")) {
+                NewScene();
             }
-            if (ImGui::MenuItem("Open")) {
-                Ref<Scene> newScene = CreateRef<Scene>();
-                SceneSerializer serializer(newScene);
-                std::string filepath = FileDialog::OpenFile("Prism Scene (*.toml)\0*.toml\0");
-                if (!filepath.empty()) {
-                    SetScene(newScene);
-
-                    serializer.Deserialize(filepath);
-                    m_SceneFilePath = filepath;
-                }
+            if (ImGui::MenuItem("Open", "Ctrl+O")) {
+                OpenScene();
             }
-            if (ImGui::MenuItem("Save", 0, false, !m_SceneFilePath.empty() && m_SceneFilePath != "Default")) {
-                SceneSerializer serializer(m_ActiveScene);
-                serializer.Serialize(m_SceneFilePath);
+            if (ImGui::MenuItem("Save", "Ctrl+S", false, !m_SceneFilePath.empty() && m_SceneFilePath != "Default")) {
+                SaveScene();
             }
-            if (ImGui::MenuItem("Save As", 0, false, !m_SceneFilePath.empty())) {
-                SceneSerializer serializer(m_ActiveScene);
-                std::string filepath = FileDialog::SaveFile("Prism Scene (*.toml)\0*.toml\0");
-                serializer.Serialize(filepath);
+            if (ImGui::MenuItem("Save As", "Ctrl+Shfit+S", false, !m_SceneFilePath.empty())) {
+                SaveSceneAs();
             }
-            if (ImGui::MenuItem("Close Scene", 0, false, !m_SceneFilePath.empty())) {
-                SetScene(CreateRef<Scene>());
-                m_SceneFilePath.clear();
+            if (ImGui::MenuItem("Close Scene", "Ctrl+W", false, !m_SceneFilePath.empty())) {
+                CloseScene();
             }
             if (ImGui::MenuItem("Exit")) {
                 Application::Instance().Close();
@@ -186,7 +181,7 @@ void EditorLayer::OnImGuiRender() {
 
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+        Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -194,9 +189,48 @@ void EditorLayer::OnImGuiRender() {
         uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*)textureID, { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
         
+        Entity selectedEntity = m_Panel.GetSelectedEntity();
+        if (selectedEntity && m_GizmoType != -1) {
+            ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist();
+            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, m_ViewportSize.x, m_ViewportSize.y);
+
+            // Camera
+            auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+            const auto& cc = cameraEntity.GetComponent<CameraComponent>().Camera;
+            const glm::mat4& cameraProjection = cc.GetProjection();
+            glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform()); 
+
+            // Entity
+            auto& tc = selectedEntity.GetComponent<TransformComponent>();
+            glm::mat4 transform = tc.GetTransform();
+
+            // Snapping
+            bool snap = Input::IsKeyPressed(PRISM_KEY_LEFT_CONTROL);
+            float snapValue = 0.1f; // Snap to 0.1 for translation/scale
+            if (m_GizmoType == ImGuizmo::OPERATION::ROTATE) {
+                snapValue = 15.0f; // Snap to 15 degrees for rotation
+            }
+
+            float snapValues[3] = { snapValue, snapValue, snapValue };
+
+            ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), 
+                ImGuizmo::OPERATION(m_GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
+                nullptr, snap ? snapValues : nullptr);
+
+            if (ImGuizmo::IsUsing()) {
+                glm::vec3 translation, rotation, scale;
+                math::DecomposeTransform(transform, translation, rotation, scale);
+
+                glm::vec3 deltaRotation = rotation - tc.Rotation;
+                tc.Translation = translation;
+                tc.Rotation += deltaRotation;
+                tc.Scale = scale;
+            }
+        }
+
         ImGui::End();
         ImGui::PopStyleVar();
-
         m_Panel.OnImGuiRender();
     } else {
         DrawWelcomePanel();
@@ -205,4 +239,74 @@ void EditorLayer::OnImGuiRender() {
     ImGui::End();
 }
 
+void EditorLayer::NewScene() {
+    SetScene(CreateRef<Scene>());   
+    m_SceneFilePath = "Default";
+}
+
+void EditorLayer::OpenScene() {
+    Ref<Scene> newScene = CreateRef<Scene>();
+    SceneSerializer serializer(newScene);
+    std::string filepath = FileDialog::OpenFile("Prism Scene (*.toml)\0*.toml\0");
+    if (!filepath.empty()) {
+        SetScene(newScene);
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+
+        serializer.Deserialize(filepath);
+        m_SceneFilePath = filepath;
+    }
+}
+
+void EditorLayer::SaveScene() {
+    SceneSerializer serializer(m_ActiveScene);
+    serializer.Serialize(m_SceneFilePath);
+}
+
+void EditorLayer::SaveSceneAs() {
+    SceneSerializer serializer(m_ActiveScene);
+    std::string filepath = FileDialog::SaveFile("Prism Scene (*.toml)\0*.toml\0");
+    serializer.Serialize(filepath);
+}
+
+void EditorLayer::CloseScene() {
+    SetScene(CreateRef<Scene>());
+    m_SceneFilePath.clear();
+}
+
+bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
+    if (e.GetRepeatCount() > 0) {
+        return false;
+    }
+
+    bool control = Input::IsKeyPressed(PRISM_KEY_LEFT_CONTROL) || Input::IsKeyPressed(PRISM_KEY_RIGHT_CONTROL);
+    bool shift = Input::IsKeyPressed(PRISM_KEY_LEFT_SHIFT) || Input::IsKeyPressed(PRISM_KEY_RIGHT_SHIFT);
+
+    switch (e.GetKeyCode()) {
+        case PRISM_KEY_N:
+            if (control) NewScene();
+            break;
+        case PRISM_KEY_O:
+            if (control) OpenScene();
+            break;
+        case PRISM_KEY_S:
+            if (control && shift) SaveSceneAs();
+            break;
+
+        // Gizmo
+        case PRISM_KEY_Q:
+            m_GizmoType = -1;
+            break;
+        case PRISM_KEY_W:
+            m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+            break;
+        case PRISM_KEY_E:
+            m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+            break;
+        case PRISM_KEY_R:
+            m_GizmoType = ImGuizmo::OPERATION::SCALE;
+            break;
+    }
+
+    return false;
+}
 } // namespace prism

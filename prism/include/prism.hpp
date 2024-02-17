@@ -8,6 +8,7 @@
 #include "core/application.hpp"
 #include "core/event/event.hpp"
 #include "core/random.hpp"
+#include "core/math/math.hpp"
 
 #include "core/event/key_event.hpp"
 #include "core/event/mouse_event.hpp"

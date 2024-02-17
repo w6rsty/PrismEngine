@@ -6,6 +6,8 @@
 #include "scene/scriptable_entity.hpp"
 
 #include "glm/glm.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/quaternion.hpp"
 
 #include <string>
 #include <functional>
@@ -29,9 +31,7 @@ struct TransformComponent {
     : Translation(translation) {}
 
     glm::mat4 GetTransform() const {
-        glm::mat4 rotation = glm::rotate(glm::mat4(1.0), Rotation.x, glm::vec3(1, 0, 0))
-            * glm::rotate(glm::mat4(1.0), Rotation.y, glm::vec3(0, 1, 0))
-            * glm::rotate(glm::mat4(1.0), Rotation.z, glm::vec3(0, 0, 1));
+        glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
         return glm::translate(glm::mat4(1.0f), Translation)
             * rotation
             * glm::scale(glm::mat4(1.0f), Scale);

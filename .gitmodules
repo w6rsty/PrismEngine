@@ -7,3 +7,6 @@
 [submodule "3rdlibs/imgui"]
 	path = 3rdlibs/imgui
 	url = https://github.com/w6rsty/imgui
+[submodule "3rdlibs/imguizmo"]
+	path = 3rdlibs/imguizmo
+	url = https://github.com/w6rsty/ImGuizmo
