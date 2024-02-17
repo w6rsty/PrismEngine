@@ -31,7 +31,7 @@ void ImGuiLayer::OnAttach() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("../../assets/fonts/JetBrainsMonoNerdFontMono-Regular.ttf", 24.0f);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/JetBrainsMonoNerdFontMono-Regular.ttf", 24.0f);
 
     ImGui::StyleColorsDark();
 

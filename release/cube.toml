@@ -1,0 +1,59 @@
+Scene = 'Untitled scene'
+
+[ViewportSize]
+Height = 1020
+Width = 1419
+
+[[Entities]]
+Tag = 'Right'
+
+    [Entities.SpriteRender]
+    Color = [ 0.14844946563243866, 0.0, 0.49230766296386719, 1.0 ]
+
+    [Entities.Transform]
+    Rotation = [ 0.0, 0.78539818525314331, 0.0 ]
+    Scale = [ 1.0, 1.0, 1.0 ]
+    Translation = [ 0.34999999403953552, 0.0, 0.34999999403953552 ]
+
+[[Entities]]
+Tag = 'Left'
+
+    [Entities.SpriteRender]
+    Color = [ 0.85538458824157715, 0.55270999670028687, 0.0, 1.0 ]
+
+    [Entities.Transform]
+    Rotation = [ 0.0, -0.78539818525314331, 0.0 ]
+    Scale = [ 1.0, 1.0, 1.0 ]
+    Translation = [ -0.34999999403953552, 0.0, 0.34999999403953552 ]
+
+[[Entities]]
+Tag = 'Camera'
+
+    [Entities.Camera]
+    FixedAspectRatio = false
+    Primary = true
+
+        [Entities.Camera.Camera]
+        OrthographicFar = 1.0
+        OrthographicNear = -1.0
+        OrthographicSize = 10.0
+        PerspectiveFOV = 0.78539818525314331
+        PerspectiveFar = 1000.0
+        PerspectiveNear = 0.0099999997764825821
+        ProjectionType = 0
+
+    [Entities.Transform]
+    Rotation = [ -0.41887903213500977, 0.0, 0.0 ]
+    Scale = [ 1.0, 1.0, 1.0 ]
+    Translation = [ 0.0, 1.0, 2.4000000953674316 ]
+
+[[Entities]]
+Tag = 'Top'
+
+    [Entities.SpriteRender]
+    Color = [ 0.0, 0.71384620666503906, 1.0, 0.78431373834609985 ]
+
+    [Entities.Transform]
+    Rotation = [ 1.5707963705062866, 0.0, 0.78539818525314331 ]
+    Scale = [ 1.0, 1.0, 1.0 ]
+    Translation = [ 0.0, 0.5, 0.0 ]
