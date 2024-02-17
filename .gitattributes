@@ -4,3 +4,6 @@
 3rdlibs/glm/* linguist-vendored
 3rdlibs/imgui/* linguist-vendored
 3rdlibs/stb_image/* linguist-vendored
+3rdlibs/entt/entt.hpp linguist-vendored
+3rdlibs/tomlplusplus/toml++/* linguist-vendored
+3rdlibs/imguizmo/* linguist-vendored

@@ -8,6 +8,7 @@
 #include "core/application.hpp"
 #include "core/event/event.hpp"
 #include "core/random.hpp"
+#include "core/math/math.hpp"
 
 #include "core/event/key_event.hpp"
 #include "core/event/mouse_event.hpp"
@@ -29,7 +30,13 @@
 
 #include "scene/scene.hpp"
 #include "scene/components.hpp"
+#include "scene/entity.hpp"
+#include "scene/scriptable_entity.hpp"
+#include "scene/scene_serializer.hpp"
+
+#include "utils/platform_utils.hpp"
 
 #include "debug/instrumentor.hpp"
+#include "imgui/palette.hpp"
 
 #define PRISM_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
