@@ -1,9 +1,2 @@
-3rdlibs/debugbreak/* linguist-vendored
-3rdlibs/glad/* linguist-vendored
-3rdlibs/glfw/* linguist-vendored
-3rdlibs/glm/* linguist-vendored
-3rdlibs/imgui/* linguist-vendored
-3rdlibs/stb_image/* linguist-vendored
-3rdlibs/entt/entt.hpp linguist-vendored
-3rdlibs/tomlplusplus/toml++/* linguist-vendored
-3rdlibs/imguizmo/* linguist-vendored
+3rdlibs/* linguist-vendored
+*.html linguist-vendored=false
